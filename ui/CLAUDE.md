@@ -110,7 +110,11 @@ src/shared/api/
 - **Calling fetch/axios/ky directly from features** — always use the API client abstraction
 - **Mixing mock data with production code** — mock implementations live exclusively in `src/shared/api/mock/`
 
-## Skills & agents
+## Hooks, skills & agents
+
+Automated quality gates are configured in `.claude/settings.json`:
+- **PostToolUse (Edit|Write)** — ESLint runs automatically on every file Claude edits. Lint errors are fed back to Claude immediately.
+- **Stop** — Full `pnpm lint` + `pnpm typecheck` run when Claude finishes a response. If there are errors, Claude sees them and should fix before considering the task done.
 
 Detailed API references and workflows live in `.claude/skills/`.
 Subagents for specialized tasks live in `.claude/agents/`.

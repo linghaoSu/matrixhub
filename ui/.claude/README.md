@@ -9,6 +9,7 @@ CLAUDE.md  = 宪法        始终加载，不可变的约束和哲学
 Rules      = 法律        始终生效，path-scoped 的编码纪律
 Skills     = 工具箱      按需加载的 API 参考 + 可触发的工作流
 Agents     = 专家顾问    隔离上下文的专用角色
+Hooks      = 自动执法    确定性脚本，每次 Edit/Write 后跑 lint，Stop 时跑全量检查
 ```
 
 ## 原始需求文档是如何被拆解的
@@ -22,6 +23,7 @@ Agents     = 专家顾问    隔离上下文的专用角色
 | Phase 0–4 工作流 | 可触发的工作流 | `skills/develop-page/` | 只在做页面级开发时需要，不应该每次改 typo 都加载 |
 | 视觉回归测试 | 需要隔离上下文 | `agents/visual-reviewer` | 要运行 Playwright、读截图、不污染主编码会话 |
 | 组件注册表更新 | 流程中的一步 | `develop-page` skill Phase 4 | 作为工作流的最后一步执行 |
+| Lint / Typecheck 门禁 | 确定性自动化 | `settings.json` hooks | 不靠 LLM "记得"跑 lint，每次 Edit 后自动执行 |
 
 **关键设计决策**：如果把完整的 Phase 0–4 流程放在 `CLAUDE.md` 里，那每次会话（包括改一行 CSS、修一个 typo）都会加载 200+ 行的工作流说明，浪费上下文窗口。做成 skill 后，只有显式调用 `/develop-page` 时才加载。但 TDD 和 CDD 的**基本纪律**仍然在 rules 中始终生效——即使不走完整工作流，改一行代码也必须有对应测试。
 
@@ -77,6 +79,49 @@ ui/
         ├── ui-reviewer.md                    # 代码审查（TDD + CDD + 全规范检查）
         └── visual-reviewer.md                # 视觉回归（Playwright 截图对比）
 ```
+
+## Hooks 详解（`.claude/settings.json`）
+
+Hooks 是确定性自动化——不依赖 LLM 判断，每次触发条件满足时必定执行。
+
+### PostToolUse: Edit|Write → 单文件 ESLint
+
+```json
+{
+  "matcher": "Edit|Write",
+  "command": "jq -r '.tool_input.file_path // empty' | xargs -I{} pnpm eslint --no-warn-ignored --max-warnings=0 {} 2>&1 || true"
+}
+```
+
+**作用**：Claude 每次编辑或创建文件后，立即对该文件运行 ESLint。错误信息作为 `additionalContext` 反馈给 Claude，Claude 看到后会自行修复。
+
+**为什么用 `|| true`**：让 hook 本身不 fail（不阻断 Claude 的工作流），但 lint 错误仍然通过 stdout 反馈给 Claude。
+
+**timeout: 30s**：单文件 lint 应该很快，30 秒超时防止挂起。
+
+### Stop → 全量 lint + typecheck
+
+```json
+{
+  "command": "echo '--- Running final quality gate ---' && pnpm lint 2>&1 | tail -20 && pnpm typecheck 2>&1 | tail -20"
+}
+```
+
+**作用**：Claude 每次完成回答（Stop 事件）时，跑完整的 `pnpm lint` 和 `pnpm typecheck`。如果有错误，Claude 会在下一轮看到并修复。
+
+**为什么 `tail -20`**：避免大量输出淹没上下文窗口，只保留最后 20 行（通常是错误摘要）。
+
+**timeout: 120s**：全量 lint + typecheck 对大项目可能较慢。
+
+### 为什么用 Hook 而不是 Rule
+
+| 方式 | 机制 | 可靠性 |
+|---|---|---|
+| Rule 里写"记得跑 lint" | 靠 LLM 记住并主动执行 | ❌ 会忘，尤其长会话 |
+| Hook (PostToolUse) | 确定性脚本，每次 Edit 自动触发 | ✅ 100% 执行 |
+| Hook (Stop) | 确定性脚本，每轮回答结束自动触发 | ✅ 100% 执行 |
+
+Hook 是 Claude Code 中唯一的"确定性执法"机制。lint 这种"必须每次都做"的事情，只有 Hook 能保证。
 
 ## 加载时机与上下文开销
 

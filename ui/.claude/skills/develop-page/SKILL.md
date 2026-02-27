@@ -265,10 +265,14 @@ Fix issues until all E2E tests pass.
 
 ### Gate
 
+Note: The PostToolUse hook in `.claude/settings.json` runs ESLint on every file edit automatically, and the Stop hook runs full lint + typecheck when you finish responding. But in the `/develop-page` workflow, explicitly verify these pass before advancing:
+
 - [ ] All E2E tests pass
 - [ ] All unit tests still pass (`pnpm test:unit`)
-- [ ] `pnpm lint` passes
-- [ ] `pnpm typecheck` passes
+- [ ] `pnpm lint` passes (zero warnings, zero errors)
+- [ ] `pnpm typecheck` passes (zero errors)
+
+If the Stop hook reported lint/typecheck errors, fix them NOW — do not proceed to Phase 4.
 
 ---
 

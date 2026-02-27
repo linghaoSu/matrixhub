@@ -36,7 +36,37 @@ Every implementation change MUST follow this cycle:
 
 - Mantine component internals (trust the library)
 - Router navigation (covered by E2E)
-- Visual pixel accuracy (covered by visual regression agent)
+- Pixel-level visual accuracy (covered by visual regression — see below)
+
+## Visual TDD: mandatory for every component
+
+Unit tests verify **logic**. Visual regression tests verify **appearance**. Both are required.
+
+Every component MUST pass visual regression with ≥ 99% pixel similarity before it can be used in page assembly. This is not optional — it has the same priority as unit tests.
+
+### The cycle
+
+1. Prepare mock data that **exactly matches the design reference** (same text, same counts, same states). See `rules/component-driven.md` for mock data requirements.
+2. Mount the component with mock data in an isolated viewport.
+3. Take a screenshot with Playwright.
+4. Compare against the design reference screenshot.
+5. Similarity ≥ 99% → PASS. Similarity < 99% → fix and re-run.
+
+### When visual regression runs
+
+- Phase 2b in `/develop-page` workflow — mandatory gate for every new component.
+- Delegated to the `visual-reviewer` agent for isolated execution.
+- Can also be triggered manually: "用 visual-reviewer 检查 {Component} 组件"
+
+### Visual test files
+
+Visual regression tests live alongside component tests:
+
+```
+ProjectCard.tsx
+ProjectCard.test.tsx           # logic TDD
+ProjectCard.visual.spec.ts     # visual TDD (Playwright)
+```
 
 ## Running tests
 

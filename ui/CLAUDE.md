@@ -104,6 +104,8 @@ src/shared/api/
 - Hardcoding business data in tests or components — keep components generic
 - Overriding child component styles from a parent with CSS hacks — fix the child component instead
 - Claiming visual accuracy without running visual regression tests
+- Advancing a component to page assembly without ≥ 99% visual regression similarity
+- Using random data or "Lorem ipsum" in visual test fixtures — mock data must match the design reference exactly
 - Skipping phases in the development workflow (`/develop-page`)
 - **Importing mock implementations directly from features** — always go through `@/shared/api`
 - **Placing API types inside feature directories** — all API types live in `src/shared/api/types/`

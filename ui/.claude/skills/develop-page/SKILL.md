@@ -183,23 +183,50 @@ For EACH new component (starting with the deepest atoms, then molecules):
 
 5. **Refactor** while keeping tests green.
 
-### 2b. Visual Regression (if design reference exists)
+### 2b. Visual Regression (MANDATORY)
 
-Only run this sub-phase when a Figma design or visual reference is provided.
+This sub-phase is NOT optional. Every new component must pass pixel-level visual regression.
 
-1. Delegate to the `visual-reviewer` agent:
-   - Provide: component file path, design reference (screenshot or description)
-   - The agent will mount the component, take a screenshot, and compare against the reference.
+1. **Prepare the fixture file** (`__fixtures__/{ComponentName}.fixture.ts`):
+   - Mock data MUST exactly match the design reference (same text, same counts, same states).
+   - Do NOT use random data, "Lorem ipsum", or generic placeholders.
+   - This fixture is the single source of truth for visual testing.
 
-2. If the agent reports diff > 1%, analyze its feedback and fix the component.
+2. **Write the visual test** (`{ComponentName}.visual.spec.ts`):
+   ```typescript
+   import { test, expect } from '@playwright/test'
+   import { projectCardFixture } from './__fixtures__/ProjectCard.fixture'
 
-3. Re-run until diff ≤ 1% or agent confirms visual match.
+   test('{ComponentName} matches design reference', async ({ page }) => {
+     // Mount component in isolation with fixture data
+     // Take screenshot
+     // Compare against baseline with 99% threshold
+     await expect(page).toHaveScreenshot('{ComponentName}.png', {
+       maxDiffPixelRatio: 0.01,  // ≤ 1% pixel difference = 99% match
+     })
+   })
+   ```
+
+3. **Delegate to the `visual-reviewer` agent**:
+   - Provide: component file path, fixture file path, design reference screenshot
+   - The agent mounts the component with fixture data, takes a screenshot, and compares
+
+4. **Threshold: ≥ 99% pixel similarity** (maxDiffPixelRatio ≤ 0.01):
+   - ≥ 99% → **PASS**
+   - < 99% → **FAIL** — analyze the agent's diff report, fix CSS/Mantine props, re-run
+   - The agent will provide specific feedback: which regions differ, what CSS properties to adjust
+
+5. **Loop until PASS**. Do NOT proceed to the next component until this one hits 99%.
 
 ### Gate
 
-- [ ] Every new component has a passing test file
+- [ ] Every new component has a passing unit test file (`.test.tsx`)
+- [ ] Every new component has a passing visual regression test (`.visual.spec.ts`)
+- [ ] Every visual test uses a fixture with data matching the design reference exactly
 - [ ] `pnpm test:unit` passes for all new components
-- [ ] Visual regression passes (if applicable)
+- [ ] All visual regression tests report ≥ 99% similarity
+
+**HARD STOP**: If any component fails visual regression, it CANNOT be used in Phase 3 page assembly. Fix the component first.
 
 ---
 

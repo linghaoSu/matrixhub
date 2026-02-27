@@ -29,6 +29,42 @@ Every new component MUST have:
 - A TypeScript interface for its props (exported, named `{ComponentName}Props`)
 - No hardcoded business data — all content via props or i18n
 - No internal API calls — data flows in via props, events flow out via callbacks
+- A **visual regression test** using mock data that exactly matches the design reference
+
+## Mock data for visual testing
+
+Mock data used in visual regression tests MUST exactly reproduce the design reference:
+
+- **Same text content**: If the Figma shows "My Project", the mock must use "My Project", not "Test" or "Lorem ipsum".
+- **Same counts**: If the design shows a table with 5 rows, the mock must have 5 items.
+- **Same states**: If the design shows a disabled button, the mock must render disabled state.
+- **Same edge cases**: If the design shows text truncation, the mock must use text long enough to trigger truncation.
+
+Mock data files live alongside visual test files:
+
+```
+src/features/projects/components/
+├── ProjectCard.tsx
+├── ProjectCard.test.tsx                # logic tests
+├── ProjectCard.visual.spec.ts          # visual regression test
+└── __fixtures__/
+    └── ProjectCard.fixture.ts          # mock data matching Figma exactly
+```
+
+```typescript
+// __fixtures__/ProjectCard.fixture.ts
+import type { ProjectCardProps } from '../ProjectCard'
+
+/** Mock data that exactly mirrors the Figma design reference */
+export const projectCardFixture: ProjectCardProps = {
+  title: 'Frontend Application',        // ← same as Figma
+  description: 'React-based console UI for MatrixHub platform management',
+  updatedAt: '2025-01-15T10:30:00Z',
+  status: 'active',
+}
+```
+
+This fixture is the **single source of truth** for both the visual test and the Storybook/sandbox rendering. Do NOT use random data or generic placeholders.
 
 ```tsx
 // ✅ Correct — generic, reusable

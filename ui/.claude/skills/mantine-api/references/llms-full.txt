@@ -1,0 +1,8 @@
+# Mantine v8 LLM-Full API Reference
+#
+# This file should contain the full contents of https://mantine.dev/llms-full.txt
+#
+# To update, run:
+#   curl -o references/llms-full.txt https://mantine.dev/llms-full.txt
+#
+# This is a placeholder. Replace with actual content before use.

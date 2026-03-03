@@ -1,0 +1,53 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "You are about to write or edit a file. If this file is inside a `pages/` directory, STOP and check: have ALL child components listed in the decomposition completed their full build cycle? Specifically, each component must have: (a) companion files created — .test.tsx, .visual.spec.ts, __fixtures__/*.fixture.ts, (b) unit tests executed and passing, (c) visual comparison test executed with ≥ 99% pixel similarity. If ANY component is missing files or has not had its tests run successfully, do NOT write the page file — go back and complete that component first."
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path // empty' | xargs -I{} pnpm eslint --no-warn-ignored --max-warnings=0 {} 2>&1 || true",
+            "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/scripts/check-component-pair.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '--- Lint + typecheck ---' && pnpm lint 2>&1 | tail -20 && pnpm typecheck 2>&1 | tail -20",
+            "timeout": 120
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/scripts/audit-component-tests.sh",
+            "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/scripts/enforce-visual-threshold.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

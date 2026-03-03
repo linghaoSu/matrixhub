@@ -1,0 +1,27 @@
+# .codex/config.toml
+#
+# Codex project-level configuration.
+# Enables multi-agent, skills discovery, and quality gates.
+
+# Allow Codex to also read CLAUDE.md as fallback
+project_doc_fallback_filenames = ["CLAUDE.md"]
+project_doc_max_bytes = 65536
+
+[features]
+multi_agent = true
+
+[agents]
+max_threads = 4
+max_depth = 1
+
+[agents.component-builder]
+description = "Builds a single component following a work plan. Runs full TDD cycle and visual regression (≥ 99% against design baseline). Commits on success."
+config_file = "agents/component-builder.toml"
+
+[agents.visual-reviewer]
+description = "Pixel-level visual regression reviewer. Compares component screenshots against design baselines. Read-only."
+config_file = "agents/visual-reviewer.toml"
+
+[agents.explorer]
+description = "Read-only codebase explorer for gathering context about existing components, registry, and API types before planning."
+config_file = "agents/explorer.toml"

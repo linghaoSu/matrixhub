@@ -1,0 +1,67 @@
+{
+  "label": "Project",
+  "tabs": {
+    "models": "Model Repository",
+    "datasets": "Datasets",
+    "members": "Members",
+    "settings": "Settings"
+  },
+  "sort": {
+    "updatedAt": "Updated Time",
+    "downloads": "Downloads",
+    "desc": "Descending",
+    "asc": "Ascending"
+  },
+  "search": {
+    "model": "Model Name",
+    "dataset": "Dataset Name",
+    "member": "User Name"
+  },
+  "createModel": "Create Model",
+  "createDataset": "Create Dataset",
+  "noModels": "No models yet",
+  "noDatasets": "No datasets yet",
+  "noMembers": "No members yet",
+  "totalRecords": "{{count}} records total",
+  "perPage": "{{count}} per page",
+  "members": {
+    "add": "Add Member",
+    "addTitle": "Add Member",
+    "colName": "Name",
+    "colMemberType": "Member Type",
+    "colRoleType": "Role Type",
+    "colActions": "Actions",
+    "user": "User",
+    "group": "Group",
+    "userLabel": "User",
+    "selectUser": "Select user",
+    "roleAdmin": "Admin",
+    "roleEditor": "Editor",
+    "roleViewer": "Viewer",
+    "editRole": "Edit Role",
+    "editRoleTitle": "Edit Role",
+    "delete": "Delete",
+    "removeTitle": "Remove Member",
+    "removeConfirm": "Are you sure you want to remove user {{name}}? After removal, this member will no longer have {{role}} permission for {{project}}.",
+    "batchDelete": "Batch Delete",
+    "batchRemoveTitle": "Batch Remove",
+    "batchRemoveConfirm": "Are you sure you want to remove {{count}} members? After removal, they will no longer have permissions for {{project}}.",
+    "refresh": "Refresh"
+  },
+  "settings": {
+    "visibility": "Project Visibility",
+    "visibilityDesc": "If the project is public, all models and datasets under it will also be public. If private, all will be private.",
+    "public": "Public",
+    "private": "Private",
+    "info": "Project Information",
+    "name": "Project Name",
+    "organization": "Organization",
+    "modelCount": "Model Count",
+    "datasetCount": "Dataset Count",
+    "dangerZone": "Danger Zone",
+    "deleteDesc": "Deleting a project will permanently remove it and all its data. This action cannot be undone.",
+    "delete": "Delete Project",
+    "deleteTitle": "Confirm Delete Project",
+    "deleteConfirm": "Are you sure you want to delete project {{name}}? This action cannot be undone."
+  }
+}

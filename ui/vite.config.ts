@@ -19,4 +19,12 @@ export default defineConfig({
     }),
     tsconfigPaths(),
   ],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://172.30.120.120:4002',
+        changeOrigin: true,
+      },
+    },
+  },
 })

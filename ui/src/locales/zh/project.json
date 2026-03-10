@@ -1,0 +1,67 @@
+{
+  "label": "项目",
+  "tabs": {
+    "models": "模型仓库",
+    "datasets": "数据集",
+    "members": "项目成员",
+    "settings": "设置"
+  },
+  "sort": {
+    "updatedAt": "更新时间",
+    "downloads": "下载量",
+    "desc": "降序",
+    "asc": "升序"
+  },
+  "search": {
+    "model": "输入模型名称搜索",
+    "dataset": "Dataset Name",
+    "member": "User Name"
+  },
+  "createModel": "创建模型",
+  "createDataset": "创建数据集",
+  "noModels": "暂无模型",
+  "noDatasets": "暂无数据集",
+  "noMembers": "暂无成员",
+  "totalRecords": "共 {{count}} 条",
+  "perPage": "每页{{count}}个",
+  "members": {
+    "add": "添加成员",
+    "addTitle": "添加成员",
+    "colName": "名称",
+    "colMemberType": "成员类型",
+    "colRoleType": "权限类型",
+    "colActions": "操作",
+    "user": "用户",
+    "group": "用户组",
+    "userLabel": "用户",
+    "selectUser": "请选择用户",
+    "roleAdmin": "管理员权限",
+    "roleEditor": "开发权限",
+    "roleViewer": "只读权限",
+    "editRole": "编辑权限",
+    "editRoleTitle": "编辑权限",
+    "delete": "删除",
+    "removeTitle": "移除成员",
+    "removeConfirm": "确定要移除用户 {{name}} 吗? 移除后该成员将不再拥有 {{project}} 的 {{role}}。",
+    "batchDelete": "批量删除",
+    "batchRemoveTitle": "批量移除",
+    "batchRemoveConfirm": "确定要移除 {{count}} 个成员吗?移除后该成员将不再拥有 {{project}} 的相应权限。",
+    "refresh": "刷新"
+  },
+  "settings": {
+    "visibility": "项目可见性",
+    "visibilityDesc": "若该项目为公开项目，则该项目及其下所有模型均为公开。若该项目为私密项目则该项目下所有模型均为私密，数据集同理。",
+    "public": "公开",
+    "private": "私密",
+    "info": "项目信息",
+    "name": "项目名称",
+    "organization": "所属组织",
+    "modelCount": "模型数量",
+    "datasetCount": "数据集数量",
+    "dangerZone": "危险操作",
+    "deleteDesc": "删除项目将永久删除该项目及其所有数据，此操作不可恢复。",
+    "delete": "删除项目",
+    "deleteTitle": "确认删除项目",
+    "deleteConfirm": "确定要删除项目 {{name}} 吗？此操作不可恢复。"
+  }
+}

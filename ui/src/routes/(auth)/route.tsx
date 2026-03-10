@@ -2,6 +2,7 @@ import {
   AppShell,
   Group,
   NavLink,
+  Stack,
   Text,
   Title,
 } from '@mantine/core'
@@ -72,20 +73,24 @@ function AppLayout() {
 
   return (
     <AppShell
-      padding="md"
+      padding={0}
       header={{
         height: 60,
       }}
     >
-      <AppShell.Header p="md">
-        <Group justify="space-between">
-          <Title order={2}>{t('translation.title')}</Title>
-          <AppNavbar />
-        </Group>
+      <AppShell.Header px={0}>
+        <div className="content-area" style={{ height: '100%' }}>
+          <Group justify="space-between" h="100%">
+            <Title order={2}>{t('title')}</Title>
+            <AppNavbar />
+          </Group>
+        </div>
       </AppShell.Header>
 
       <AppShell.Main>
-        <Outlet />
+        <Stack className="content-area" pb="xl">
+          <Outlet />
+        </Stack>
       </AppShell.Main>
     </AppShell>
   )

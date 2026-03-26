@@ -81,6 +81,7 @@ message PullBasePolicy {
   string target_resource_name = 4;
   // post or put do not require this field.
   Registry source_registry = 5;
+  string target_project_name = 6;
 }
 
 message PushBasePolicy {
@@ -90,6 +91,7 @@ message PushBasePolicy {
   string target_resource_name = 4;
   // post or put do not require this field.
   Registry target_registry = 5;
+  string target_project_name = 6;
 }
 
 enum TriggerType {

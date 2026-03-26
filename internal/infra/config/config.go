@@ -29,6 +29,7 @@ type Config struct {
 	Debug         bool             `yaml:"debug"`
 	Log           log.Config       `yaml:"log"`
 	APIServer     *APIServerConfig `yaml:"apiServer" validate:"required"`
+	UI            UIConfig         `yaml:"ui"`
 	MigrationPath string           `yaml:"migrationPath" validate:"required"`
 
 	DataDir string `yaml:"dataDir" validate:"required"`
@@ -38,6 +39,10 @@ type Config struct {
 
 type APIServerConfig struct {
 	Port int `yaml:"port" validate:"required"`
+}
+
+type UIConfig struct {
+	StaticDir string `yaml:"staticDir"`
 }
 
 func Init(configPath, sqlPath string) (*Config, error) {

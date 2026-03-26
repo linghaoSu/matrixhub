@@ -21,7 +21,7 @@ import (
 
 	"github.com/matrixhub-ai/matrixhub/internal/domain/user"
 	"github.com/matrixhub-ai/matrixhub/internal/infra/crypto"
-	"github.com/matrixhub-ai/matrixhub/internal/utils"
+	"github.com/matrixhub-ai/matrixhub/internal/infra/utils"
 )
 
 type UserRepo struct {
@@ -75,6 +75,19 @@ func (u *UserRepo) ListUsers(ctx context.Context, page, pageSize int, search str
 
 func (u *UserRepo) DeleteUser(ctx context.Context, id int) error {
 	return u.db.WithContext(ctx).Where("id = ?", id).Delete(&user.User{}).Error
+}
+
+func (u *UserRepo) UpdateUserPassword(ctx context.Context, id int, password string) error {
+	user, err := u.GetUser(ctx, id)
+	if err != nil {
+		return err
+	}
+	password, err = crypto.HashPassword(password)
+	if err != nil {
+		return err
+	}
+	user.Password = password
+	return u.db.WithContext(ctx).Model(user).Where("id = ?", user.ID).Updates(user).Error
 }
 
 func NewUserRepo(db *gorm.DB) user.IUserRepo {

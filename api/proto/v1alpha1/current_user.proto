@@ -96,7 +96,7 @@ message GetCurrentUserRequest{
 }
 
 message GetCurrentUserResponse{
-  string id = 1;
+  uint32 id = 1;
   string username = 2;
   bool is_admin = 3;
 }

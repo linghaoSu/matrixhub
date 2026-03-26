@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { z } from 'zod'
 
-import { modelsQueryOptions } from '@/features/models/models.query'
+import { projectModelsQueryOptions } from '@/features/models/models.query'
 import { ProjectModelsPage } from '@/features/projects/pages/ProjectModelsPage'
 
 // -- URL search schema (route concern) --
@@ -26,7 +26,7 @@ export const Route = createFileRoute(
     deps,
   }) => {
     await context.queryClient.ensureQueryData(
-      modelsQueryOptions(params.projectId, deps),
+      projectModelsQueryOptions(params.projectId, deps),
     )
   },
   component: RouteComponent,

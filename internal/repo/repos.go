@@ -23,6 +23,9 @@ import (
 	"github.com/matrixhub-ai/matrixhub/internal/domain/git"
 	"github.com/matrixhub-ai/matrixhub/internal/domain/model"
 	"github.com/matrixhub-ai/matrixhub/internal/domain/project"
+	"github.com/matrixhub-ai/matrixhub/internal/domain/registry"
+	"github.com/matrixhub-ai/matrixhub/internal/domain/syncjob"
+	"github.com/matrixhub-ai/matrixhub/internal/domain/syncpolicy"
 	"github.com/matrixhub-ai/matrixhub/internal/domain/user"
 	"github.com/matrixhub-ai/matrixhub/internal/infra/config"
 	"github.com/matrixhub-ai/matrixhub/internal/infra/db"
@@ -35,11 +38,15 @@ type Repos struct {
 	GitMirror  *mirror.Mirror
 	Project    project.IProjectRepo
 	User       user.IUserRepo
+	Registry   registry.IRegistryRepo
 	Model      model.IModelRepo
 	Label      model.ILabelRepo
 	Git        git.IGitRepo
 	Dataset    dataset.IDatasetRepo
 	Session    user.ISessionRepo
+	SyncPolicy syncpolicy.ISyncPolicyRepo
+	SyncTask   syncpolicy.ISyncTaskRepo
+	SyncJob    syncjob.ISyncJobRepo
 }
 
 func NewRepos(conf *config.Config, gitStorage *gitstorage.Storage, gitMirror *mirror.Mirror) *Repos {
@@ -62,6 +69,10 @@ func NewRepos(conf *config.Config, gitStorage *gitstorage.Storage, gitMirror *mi
 	repos.Label = NewLabelDB(repos.DB)
 	repos.Git = NewGitDB(repos.GitStorage, repos.GitMirror)
 	repos.Dataset = NewDatasetDB(repos.DB)
+	repos.Registry = NewRegistryRepo(repos.DB)
+	repos.SyncPolicy = NewSyncPolicyDB(repos.DB)
+	repos.SyncTask = NewSyncTaskDB(repos.DB)
+	repos.SyncJob = NewSyncJobDB(repos.DB)
 
 	return repos
 }

@@ -22,12 +22,14 @@ import (
 )
 
 type ISyncPolicyService interface {
-	GetSyncPolicy(ctx context.Context, param *SyncPolicy) (*SyncPolicy, error)
+	GetSyncPolicy(ctx context.Context, id int) (*SyncPolicy, error)
 	CreateSyncPolicy(ctx context.Context, param *SyncPolicy) error
 	UpdateSyncPolicy(ctx context.Context, param *SyncPolicy) error
-	DeleteSyncPolicy(ctx context.Context, param *SyncPolicy) error
-	GetSyncTask(ctx context.Context, param *SyncTask) (*SyncTask, error)
+	DeleteSyncPolicy(ctx context.Context, id int) error
+	ListSyncPolicies(ctx context.Context, page, pageSize int, search string) ([]*SyncPolicy, int64, error)
+	GetSyncTask(ctx context.Context, id int) (*SyncTask, error)
 	CreateSyncTask(ctx context.Context, param *SyncTask) (*SyncTask, error)
+	ListSyncTasksByPolicyID(ctx context.Context, policyID int, page, pageSize int, search string) ([]*SyncTask, int64, error)
 	CreateSyncTaskAndSyncJobs(ctx context.Context, param *SyncPolicy) error
 	CreateExcecuteSyncTaskAndSyncJobs(ctx context.Context, param *SyncPolicy) error
 }
@@ -46,8 +48,8 @@ func NewSyncPolicyService(sprepo ISyncPolicyRepo, strepo ISyncTaskRepo, sjservic
 	}
 }
 
-func (sps *SyncPolicyService) GetSyncPolicy(ctx context.Context, param *SyncPolicy) (*SyncPolicy, error) {
-	return sps.syncPolicyRepo.GetSyncPolicy(ctx, param)
+func (sps *SyncPolicyService) GetSyncPolicy(ctx context.Context, id int) (*SyncPolicy, error) {
+	return sps.syncPolicyRepo.GetSyncPolicy(ctx, id)
 }
 
 func (sps *SyncPolicyService) CreateSyncPolicy(ctx context.Context, param *SyncPolicy) error {
@@ -57,15 +59,24 @@ func (sps *SyncPolicyService) UpdateSyncPolicy(ctx context.Context, param *SyncP
 	return sps.syncPolicyRepo.UpdateSyncPolicy(ctx, param)
 }
 
-func (sps *SyncPolicyService) DeleteSyncPolicy(ctx context.Context, param *SyncPolicy) error {
-	return sps.syncPolicyRepo.DeleteSyncPolicy(ctx, param)
+func (sps *SyncPolicyService) DeleteSyncPolicy(ctx context.Context, id int) error {
+	return sps.syncPolicyRepo.DeleteSyncPolicy(ctx, id)
 }
-func (sps *SyncPolicyService) GetSyncTask(ctx context.Context, syncTask *SyncTask) (*SyncTask, error) {
-	return sps.syncTaskRepo.GetSyncTask(ctx, syncTask)
+
+func (sps *SyncPolicyService) ListSyncPolicies(ctx context.Context, page, pageSize int, search string) ([]*SyncPolicy, int64, error) {
+	return sps.syncPolicyRepo.ListSyncPolicies(ctx, page, pageSize, search)
+}
+
+func (sps *SyncPolicyService) GetSyncTask(ctx context.Context, id int) (*SyncTask, error) {
+	return sps.syncTaskRepo.GetSyncTask(ctx, id)
 }
 
 func (sps *SyncPolicyService) CreateSyncTask(ctx context.Context, syncTask *SyncTask) (*SyncTask, error) {
 	return sps.syncTaskRepo.CreateSyncTask(ctx, syncTask)
+}
+
+func (sps *SyncPolicyService) ListSyncTasksByPolicyID(ctx context.Context, policyID int, page, pageSize int, search string) ([]*SyncTask, int64, error) {
+	return sps.syncTaskRepo.ListSyncTasksByPolicyID(ctx, policyID, page, pageSize, search)
 }
 
 func (sps *SyncPolicyService) CreateSyncTaskAndSyncJobs(ctx context.Context, policy *SyncPolicy) error {

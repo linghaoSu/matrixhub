@@ -20,6 +20,8 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -43,6 +45,8 @@ import (
 	"github.com/matrixhub-ai/matrixhub/internal/apiserver/middleware"
 	"github.com/matrixhub-ai/matrixhub/internal/domain/dataset"
 	"github.com/matrixhub-ai/matrixhub/internal/domain/model"
+	"github.com/matrixhub-ai/matrixhub/internal/domain/syncjob"
+	"github.com/matrixhub-ai/matrixhub/internal/domain/syncpolicy"
 	"github.com/matrixhub-ai/matrixhub/internal/domain/user"
 	"github.com/matrixhub-ai/matrixhub/internal/infra/config"
 	"github.com/matrixhub-ai/matrixhub/internal/infra/log"
@@ -64,8 +68,9 @@ type APIServer struct {
 	gitHooks   gitHooks
 	gitStorage gitStorage
 
-	repos    *repo.Repos
-	handlers []handler.IHandler
+	repos        *repo.Repos
+	handlers     []handler.IHandler
+	modelService model.IModelService
 }
 
 func NewAPIServer(config *config.Config) *APIServer {
@@ -80,12 +85,7 @@ func NewAPIServer(config *config.Config) *APIServer {
 
 	gatewayMux := runtime.NewServeMux(
 		runtime.WithForwardResponseOption(middleware.ResponseHeaderLocation),
-		runtime.WithOutgoingHeaderMatcher(func(s string) (string, bool) {
-			if s == "Content-Disposition" {
-				return s, true
-			}
-			return fmt.Sprintf("%s%s", runtime.MetadataHeaderPrefix, s), true
-		}),
+		runtime.WithOutgoingHeaderMatcher(middleware.HeaderMatcher),
 	)
 
 	httpServer := &http.Server{
@@ -102,6 +102,8 @@ func NewAPIServer(config *config.Config) *APIServer {
 		port:       config.APIServer.Port,
 	}
 
+	server.initGitHooks()
+	server.initGitStorage()
 	server.initHandlersServicesRepos()
 
 	streamMiddleware := []grpc.StreamServerInterceptor{
@@ -124,8 +126,6 @@ func NewAPIServer(config *config.Config) *APIServer {
 	)
 	server.grpcServer = grpcServer
 
-	server.initGitHooks()
-	server.initGitStorage()
 	server.httpServer.Handler = server.initBackends(server.httpServer.Handler)
 	server.registerRoutersAndHandlers()
 
@@ -152,7 +152,38 @@ func (server *APIServer) initGitHooks() {
 	}
 
 	postReceiveHookFunc := func(ctx context.Context, repoName string, updates []receive.RefUpdate) error {
-		// userInfo, _ := authenticate.GetUserInfo(ctx)
+		// Detect repo type from repoName prefix
+		repoType := "models"
+		actualName := repoName
+
+		if strings.HasPrefix(repoName, "datasets/") {
+			repoType = "datasets"
+			actualName = strings.TrimPrefix(repoName, "datasets/")
+		} else if strings.HasPrefix(repoName, "spaces/") {
+			repoType = "spaces"
+			actualName = strings.TrimPrefix(repoName, "spaces/")
+		}
+
+		// Only handle models for now
+		if repoType != "models" {
+			return nil
+		}
+
+		parts := strings.SplitN(actualName, "/", 2)
+		if len(parts) != 2 {
+			log.Warnf("invalid repo name format: %s", repoName)
+			return nil
+		}
+
+		if server.modelService == nil {
+			log.Warnf("Model service not initialized, skipping metadata sync for %s", repoName)
+			return nil
+		}
+
+		if err := server.modelService.SyncMetadata(ctx, parts[0], parts[1]); err != nil {
+			log.Errorf("failed to sync metadata for %s/%s: %v", parts[0], parts[1], err)
+		}
+
 		return nil
 	}
 
@@ -162,7 +193,13 @@ func (server *APIServer) initGitHooks() {
 	}
 
 	mirrorRefFilterFunc := func(ctx context.Context, repoName string, remoteRefs []string) ([]string, error) {
-		return remoteRefs, nil
+		filteredRefs := []string{}
+		for _, ref := range remoteRefs {
+			if strings.HasPrefix(ref, "refs/heads/") || strings.HasPrefix(ref, "refs/tags/") {
+				filteredRefs = append(filteredRefs, ref)
+			}
+		}
+		return filteredRefs, nil
 	}
 
 	server.gitHooks.permissionHookFunc = permissionHookFunc
@@ -269,19 +306,37 @@ func (server *APIServer) initHandlersServicesRepos() {
 	)
 	userService := user.NewUserService(repos.Session, repos.User)
 
+	// init sync job service (required by sync policy service)
+	syncJobService := syncjob.NewSyncJobService(
+		repos.SyncJob,
+		repos.Registry,
+		repos.Project,
+		repos.Model,
+		repos.Git,
+	)
+
+	// init sync policy service
+	syncPolicyService := syncpolicy.NewSyncPolicyService(
+		repos.SyncPolicy,
+		repos.SyncTask,
+		syncJobService,
+	)
+
 	// init handlers
 	handlers := []handler.IHandler{
 		handler.NewLoginHandler(userService),
 		handler.NewProjectHandler(repos.Project),
 		handler.NewUserHandler(repos.User),
 		handler.NewCurrentUserHandler(repos.User),
-		handler.NewRegistryHandler(),
+		handler.NewRegistryHandler(repos.Registry),
 		handler.NewDatasetHandler(datasetService),
 		handler.NewModelHandler(modelService),
+		handler.NewSyncPolicyHandler(syncPolicyService, repos.Registry),
 	}
 
 	server.repos = repos
 	server.handlers = handlers
+	server.modelService = modelService
 }
 
 func (server *APIServer) registerRoutersAndHandlers() {
@@ -291,18 +346,24 @@ func (server *APIServer) registerRoutersAndHandlers() {
 	// register routers
 	server.engine.Any("/api/v1alpha1/*any", gin.WrapF(server.gatewayMux.ServeHTTP))
 
-	// serve frontend static files
-	server.engine.Static("/assets", "/app/assets")
+	// serve ui static files if staticDir is configured
+	staticDir := server.config.UI.StaticDir
+	if staticDir != "" {
+		server.engine.Static("/assets", filepath.Join(staticDir, "assets"))
+	}
 
 	// SPA fallback - serve index.html for all non-API routes
 	server.engine.NoRoute(func(c *gin.Context) {
-		// If the request is for an API route that doesn't exist, return 404
-		if len(c.Request.URL.Path) >= 4 && c.Request.URL.Path[:4] == "/api" {
+		if strings.HasPrefix(c.Request.URL.Path, "/api") {
 			c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
 			return
 		}
-		// For all other routes, serve index.html (SPA routing)
-		c.File("/app/index.html")
+		if staticDir != "" {
+			c.File(filepath.Join(staticDir, "index.html"))
+			return
+		}
+		// If staticDir is not configured, return 404 for non-API routes
+		c.JSON(http.StatusNotFound, gin.H{"error": "frontend not configured"})
 	})
 
 	options := &handler.ServerOptions{

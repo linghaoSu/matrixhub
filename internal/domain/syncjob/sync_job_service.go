@@ -16,6 +16,7 @@ package syncjob
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/matrixhub-ai/matrixhub/internal/domain/git"
 	"github.com/matrixhub-ai/matrixhub/internal/domain/model"
@@ -24,7 +25,7 @@ import (
 )
 
 type ISyncJobService interface {
-	GetSyncJob(ctx context.Context, param *SyncJob) (*SyncJob, error)
+	GetSyncJob(ctx context.Context, id int) (*SyncJob, error)
 	CreateSyncJob(ctx context.Context, param *SyncJob) error
 	CreateAndExcecuteSyncJob(ctx context.Context, param *SyncJob) error
 	ExecuteSyncJob(ctx context.Context, param *SyncJob) error
@@ -48,8 +49,8 @@ func NewSyncJobService(srepo ISyncJobRepo, rrepo registry.IRegistryRepo, prepo p
 	}
 }
 
-func (sjs *SyncJobService) GetSyncJob(ctx context.Context, syncJob *SyncJob) (*SyncJob, error) {
-	return sjs.syncJobRepo.GetSyncJob(ctx, syncJob)
+func (sjs *SyncJobService) GetSyncJob(ctx context.Context, id int) (*SyncJob, error) {
+	return sjs.syncJobRepo.GetSyncJob(ctx, id)
 }
 
 func (sjs *SyncJobService) CreateSyncJob(ctx context.Context, syncJob *SyncJob) error {
@@ -66,7 +67,7 @@ func (sjs *SyncJobService) CreateAndExcecuteSyncJob(ctx context.Context, syncJob
 func (sjs *SyncJobService) ExecuteSyncJob(ctx context.Context, syncJob *SyncJob) error {
 	reg, err := sjs.registryRepo.GetRegistry(ctx, syncJob.RemoteRegistryID)
 	if err != nil {
-		return err
+		return fmt.Errorf("get registry(id=%d): %w", syncJob.RemoteRegistryID, err)
 	}
 	prj, err := sjs.projectRepo.GetProjectByName(ctx, syncJob.ProjectName)
 	if err != nil {
@@ -75,11 +76,11 @@ func (sjs *SyncJobService) ExecuteSyncJob(ctx context.Context, syncJob *SyncJob)
 				Name: syncJob.ProjectName,
 			}
 			prj, err = sjs.projectRepo.CreateProject(ctx, prj)
-			if err == nil {
-				return err
+			if err != nil {
+				return fmt.Errorf("create project(%s): %w", syncJob.ProjectName, err)
 			}
 		} else {
-			return err
+			return fmt.Errorf("get project(%s): %w", syncJob.ProjectName, err)
 		}
 	}
 	gr := &git.GitRepository{
@@ -97,8 +98,9 @@ func (sjs *SyncJobService) ExecuteSyncJob(ctx context.Context, syncJob *SyncJob)
 		}
 	} else {
 		mod = &model.Model{
-			Name:      syncJob.ResourceName,
-			ProjectID: prj.ID,
+			Name:        syncJob.ResourceName,
+			ProjectID:   prj.ID,
+			ProjectName: syncJob.ProjectName,
 		}
 
 		if _, err = sjs.modelRepo.Create(ctx, mod); err != nil {

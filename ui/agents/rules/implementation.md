@@ -11,6 +11,7 @@ This document combines the current UI stack and the key rules around Mantine, Ta
 - `Mantine v8`
 - `TanStack Router`
 - `TanStack Form`
+- `TanStack Query`
 - `Zod`
 - `react-i18next`
 - `ESLint v9`
@@ -41,10 +42,15 @@ This document combines the current UI stack and the key rules around Mantine, Ta
 ## Figma Assets
 
 - Committed SVG assets belong under `src/assets/svgs`
+- Before committing a new icon SVG from Figma, first check whether `@tabler/icons-react` already provides a suitable icon and prefer the package when it does
+- Only add a committed SVG icon when no suitable Tabler icon exists, or when the asset is brand-specific and must preserve its exact shape
+- When a Figma icon has no suitable Tabler equivalent, confirm the download or save step before adding a new SVG asset
 - Do not leave reusable SVG markup inline in route or component files unless the SVG must be generated dynamically
 - Temporary exports and comparisons may live under `.planning/<task>/`
 
 ## Router
+
+Baseline rules — see `tanstack-router.md` for full conventions.
 
 - All route files belong in `src/routes`
 - Every route file should explicitly export `Route`
@@ -52,63 +58,37 @@ This document combines the current UI stack and the key rules around Mantine, Ta
 - Non-trivial pages should live in `src/features` and be mounted by the route
 - Do not let complex business logic stay in route files long term
 
+## Data Fetching
+
+See `tanstack-query.md` for full conventions. Key rules:
+
+- Use `queryOptions()` / `mutationOptions()` factories — never inline query config
+- Use query key factory objects per feature
+- Use `MutationCache` / `QueryCache` for global error/success notifications via Mantine — see `tanstack-integration.md`
+
 ## Forms
 
+Baseline rules — see `tanstack-form.md` for full conventions and Mantine binding patterns.
+
 - Use `@tanstack/react-form` for all forms in this project
-- Use `Zod` as the default validation and schema definition approach for form data
+- Use `Zod` as the default validation and schema definition approach for form data; let Zod provide the error messages — do not hand-write error strings that duplicate what the schema already expresses
 - Do not use uncontrolled forms, native ad-hoc form state, Mantine `useForm`, or other form libraries for new form work
-- Prefer TanStack Form validators backed by `Zod` schemas instead of duplicating validation logic by hand
-- Use TanStack Form validators for field-level validation and `onSubmit` validation for form-level or cross-field rules
+- Pass Zod schemas directly to field-level `validators` (e.g. `validators: { onSubmit: schema }`) — TanStack Form v1 supports Standard Schema natively, so Zod schemas work without an adapter; do not write manual `safeParse` calls
+- Use `fieldError(field)` from `@/shared/utils/form` to extract the first error message for Mantine `error` props — Standard Schema errors are complex objects, not strings
+- Use Mantine's own `label` and `withAsterisk` props on form field components for labelling — do not render separate `<Text>` elements as field labels
 - Keep Mantine as the field UI layer; bind TanStack Form state to Mantine component props such as `value`, `checked`, `onChange`, and `error`
+- Connect form `onSubmit` to TanStack Query mutations — see `tanstack-integration.md` for the full pattern
 
-Example:
+## Error Notifications
 
-```tsx
-import { TextInput } from '@mantine/core'
-import { useForm } from '@tanstack/react-form'
-import { z } from 'zod'
+See `tanstack-integration.md` for the complete error handling strategy.
 
-const nameSchema = z.string().trim().min(1, 'Project name is required')
-
-function CreateProjectForm() {
-  const form = useForm({
-    defaultValues: {
-      name: '',
-      description: '',
-    },
-    onSubmit: async ({ value }) => {
-      await createProject(value)
-    },
-  })
-
-  return (
-    <form
-      onSubmit={(event) => {
-        event.preventDefault()
-        form.handleSubmit()
-      }}
-    >
-      <form.Field
-        name="name"
-        validators={{
-          onChange: ({ value }) => {
-            const result = nameSchema.safeParse(value)
-            return result.success ? undefined : result.error.issues[0]?.message
-          },
-        }}
-        children={(field) => (
-          <TextInput
-            label={t('projects.nameLabel')}
-            value={field.state.value}
-            onChange={(event) => field.handleChange(event.currentTarget.value)}
-            error={field.state.meta.errors?.[0]}
-          />
-        )}
-      />
-    </form>
-  )
-}
-```
+- All API errors must surface through Mantine notifications (`@mantine/notifications`)
+- Mutation errors: handled globally by `MutationCache.onError`
+- Background query refetch errors: handled globally by `QueryCache.onError`
+- Route load errors: handled by route `errorComponent`
+- Form validation errors: shown inline via Mantine component `error` prop
+- Do not add per-component `try-catch` or `notifications.show()` for API errors
 
 ## Tables
 
@@ -120,6 +100,7 @@ function CreateProjectForm() {
 - If the required wrapper does not exist yet, create or extend the project table wrapper first, then use that wrapper in the page
 - Put stable shared table wrappers under `src/shared/components/data-table/` unless the project later adopts a different shared location
 - Centralize shared table styling and behavior in the wrapper, including pagination, loading states, empty states, row actions, selection behavior, and similar concerns
+- For route-backed list pages that use the shared table wrapper, keep query/search params, pagination navigation, refresh triggers, and row-selection state in the page layer or a shared hook such as `src/shared/hooks/useRouteListState.ts`; the shared hook expects the search object to have `page` / `query` fields and derives row selection from the current records via `records` + `getRecordId`; feature table components should stay focused on columns, cells, and feature-specific toolbar/actions
 - Do not introduce a different table abstraction or second table library for the same class of UI without agreement
 
 ## Feature Page Splitting Guidelines

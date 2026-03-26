@@ -17,6 +17,7 @@ package repo
 import (
 	"context"
 	"fmt"
+	"io"
 	stdpath "path"
 	"strings"
 
@@ -61,12 +62,45 @@ func (g *gitRepo) gitPath(repoType string, project, name string) string {
 }
 
 func (g *gitRepo) buildURL(repoType, project, name, revision, path string) string {
+	if revision == "" {
+		revision = "main"
+	} else if strings.Contains(revision, "/") {
+		// If revision is a ref like refs/heads/main or refs/tags/v1, keep only the last part
+		revision = stdpath.Base(revision)
+	}
+
 	return fmt.Sprintf("/%s/%s/resolve/%s/%s", repoPrefix(repoType)+project, name, revision, path)
 }
 
+// resolveRef disambiguates a short revision name by trying refs/heads/ before refs/tags/.
+// Already-qualified refs (refs/heads/..., refs/tags/...) and 40-char SHAs pass through unchanged.
+func resolveRef(repo *repository.Repository, rev string) string {
+	if rev == "" || strings.HasPrefix(rev, "refs/") || isCommitSHA(rev) {
+		return rev
+	}
+	if _, err := repo.ResolveRevision("refs/heads/" + rev); err == nil {
+		return "refs/heads/" + rev
+	}
+	if _, err := repo.ResolveRevision("refs/tags/" + rev); err == nil {
+		return "refs/tags/" + rev
+	}
+	return rev
+}
+
+func isCommitSHA(s string) bool {
+	if len(s) != 40 {
+		return false
+	}
+	for _, c := range s {
+		if (c < '0' || c > '9') && (c < 'a' || c > 'f') && (c < 'A' || c > 'F') {
+			return false
+		}
+	}
+	return true
+}
+
 // CreateRepository initializes a Git repository
-func (g *gitRepo) CreateRepository(ctx context.Context, project, name string) error {
-	repoType := "models"
+func (g *gitRepo) CreateRepository(ctx context.Context, repoType, project, name string) error {
 	gitPath := g.gitPath(repoType, project, name)
 	if repository.IsRepository(gitPath) {
 		return fmt.Errorf("repository already exists at %s", gitPath)
@@ -99,8 +133,7 @@ func (g *gitRepo) CreateRepository(ctx context.Context, project, name string) er
 }
 
 // DeleteRepository removes the Git repository
-func (g *gitRepo) DeleteRepository(ctx context.Context, project, name string) error {
-	repoType := "models"
+func (g *gitRepo) DeleteRepository(ctx context.Context, repoType, project, name string) error {
 	gitPath := g.gitPath(repoType, project, name)
 	if !repository.IsRepository(gitPath) {
 		return fmt.Errorf("repository does not exist at %s", gitPath)
@@ -113,8 +146,7 @@ func (g *gitRepo) DeleteRepository(ctx context.Context, project, name string) er
 }
 
 // ListRevisions returns all branches and tags for a model
-func (g *gitRepo) ListRevisions(ctx context.Context, project, name string) (*git.Revisions, error) {
-	repoType := "models"
+func (g *gitRepo) ListRevisions(ctx context.Context, repoType, project, name string) (*git.Revisions, error) {
 	gitPath := g.gitPath(repoType, project, name)
 	if !repository.IsRepository(gitPath) {
 		return nil, fmt.Errorf("repository does not exist at %s", gitPath)
@@ -152,8 +184,7 @@ func (g *gitRepo) ListRevisions(ctx context.Context, project, name string) (*git
 }
 
 // ListCommits returns the commit history for a model
-func (g *gitRepo) ListCommits(ctx context.Context, project, name, revision string, page, pageSize int) ([]*git.Commit, int64, error) {
-	repoType := "models"
+func (g *gitRepo) ListCommits(ctx context.Context, repoType, project, name, revision string, page, pageSize int) ([]*git.Commit, int64, error) {
 	gitPath := g.gitPath(repoType, project, name)
 	if !repository.IsRepository(gitPath) {
 		return nil, 0, fmt.Errorf("repository does not exist at %s", gitPath)
@@ -163,6 +194,7 @@ func (g *gitRepo) ListCommits(ctx context.Context, project, name, revision strin
 		return nil, 0, err
 	}
 
+	revision = resolveRef(repo, revision)
 	commits, err := repo.Commits(revision, nil)
 	if err != nil {
 		return nil, 0, err
@@ -189,6 +221,8 @@ func (g *gitRepo) ListCommits(ctx context.Context, project, name, revision strin
 			AuthorDate:     c.Author().When(),
 			CommitterName:  c.Committer().Name(),
 			CommitterEmail: c.Committer().Email(),
+			CommitterDate:  c.Committer().When(),
+			CreatedAt:      c.Committer().When(),
 		})
 	}
 
@@ -196,8 +230,7 @@ func (g *gitRepo) ListCommits(ctx context.Context, project, name, revision strin
 }
 
 // GetCommit returns a specific commit by ID
-func (g *gitRepo) GetCommit(ctx context.Context, project, name, commitID string) (*git.Commit, error) {
-	repoType := "models"
+func (g *gitRepo) GetCommit(ctx context.Context, repoType, project, name, commitID string) (*git.Commit, error) {
 	gitPath := g.gitPath(repoType, project, name)
 	if !repository.IsRepository(gitPath) {
 		return nil, fmt.Errorf("repository does not exist at %s", gitPath)
@@ -230,12 +263,13 @@ func (g *gitRepo) GetCommit(ctx context.Context, project, name, commitID string)
 		AuthorDate:     c.Author().When(),
 		CommitterName:  c.Committer().Name(),
 		CommitterEmail: c.Committer().Email(),
+		CommitterDate:  c.Committer().When(),
+		CreatedAt:      c.Committer().When(),
 	}, nil
 }
 
 // GetTree returns the file tree at a specific revision and path
-func (g *gitRepo) GetTree(ctx context.Context, project, name, revision, path string) ([]*git.TreeEntry, error) {
-	repoType := "models"
+func (g *gitRepo) GetTree(ctx context.Context, repoType, project, name, revision, path string) ([]*git.TreeEntry, error) {
 	gitPath := g.gitPath(repoType, project, name)
 	if !repository.IsRepository(gitPath) {
 		return nil, fmt.Errorf("repository does not exist at %s", gitPath)
@@ -245,7 +279,7 @@ func (g *gitRepo) GetTree(ctx context.Context, project, name, revision, path str
 		return nil, err
 	}
 
-	entries, err := repo.Tree(revision, path, &repository.TreeOptions{
+	entries, err := repo.Tree(resolveRef(repo, revision), path, &repository.TreeOptions{
 		Recursive: false,
 	})
 	if err != nil {
@@ -309,8 +343,7 @@ func (g *gitRepo) GetTree(ctx context.Context, project, name, revision, path str
 }
 
 // GetBlob returns the content of a file at a specific revision
-func (g *gitRepo) GetBlob(ctx context.Context, project, name, revision, path string) (*git.TreeEntry, error) {
-	repoType := "models"
+func (g *gitRepo) GetBlob(ctx context.Context, repoType, project, name, revision, path string) (*git.TreeEntry, error) {
 	gitPath := g.gitPath(repoType, project, name)
 	if !repository.IsRepository(gitPath) {
 		return nil, fmt.Errorf("repository does not exist at %s", gitPath)
@@ -320,6 +353,7 @@ func (g *gitRepo) GetBlob(ctx context.Context, project, name, revision, path str
 		return nil, err
 	}
 
+	revision = resolveRef(repo, revision)
 	blob, err := repo.Blob(revision, path)
 	if err != nil {
 		// Check if it's a directory
@@ -405,4 +439,58 @@ func (g *gitRepo) Pull(ctx context.Context, gitRepository *git.GitRepository) er
 	repoName := repoPrefix(gitRepository.ResourceType) + gitRepository.ProjectName + "/" + gitRepository.ResourceName
 	sourceURL := strings.TrimSuffix(gitRepository.RemoteRegistryURL, "/") + "/" + repoName
 	return g.mirror.Sync(ctx, gitPath, repoName, mirror.WithSyncMirrorSourceURL(sourceURL))
+}
+
+// ExtractMetadata reads raw metadata-related files from a Git repository.
+func (g *gitRepo) ExtractMetadata(ctx context.Context, repoType, project, name string) (*git.RepoMetadataFiles, error) {
+	metadata := &git.RepoMetadataFiles{}
+
+	// Open Git repository
+	gitPath := g.gitPath(repoType, project, name)
+	repo, err := repository.Open(gitPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open git repo: %w", err)
+	}
+
+	rev := repo.DefaultBranch()
+
+	// Read README.md raw content
+	if blob, err := repo.Blob(rev, "README.md"); err == nil {
+		if rc, err := blob.NewReader(); err == nil {
+			content, err := io.ReadAll(rc)
+			_ = rc.Close()
+			if err == nil {
+				metadata.ReadmeContent = content
+			}
+		}
+	}
+
+	// Read config.json raw content
+	if blob, err := repo.Blob(rev, "config.json"); err == nil {
+		if rc, err := blob.NewReader(); err == nil {
+			content, err := io.ReadAll(rc)
+			_ = rc.Close()
+			if err == nil {
+				metadata.ConfigJSON = content
+			}
+		}
+	}
+
+	// Read model.safetensors.index.json raw content
+	if blob, err := repo.Blob(rev, "model.safetensors.index.json"); err == nil {
+		if rc, err := blob.NewReader(); err == nil {
+			content, err := io.ReadAll(rc)
+			_ = rc.Close()
+			if err == nil {
+				metadata.SafetensorsIndexJSON = content
+			}
+		}
+	}
+
+	// Compute repository size
+	if size, err := repo.DiskUsage(); err == nil {
+		metadata.Size = size
+	}
+
+	return metadata, nil
 }

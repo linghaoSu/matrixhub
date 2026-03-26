@@ -37,10 +37,27 @@ func (Registry) TableName() string {
 	return "registries"
 }
 
+// GetCredential returns the registry credential built from persistence fields; nil when none or invalid.
+func (r *Registry) GetCredential() ICredential {
+	return ParseCredentialInfo(r.CredentialType, r.AuthInfo)
+}
+
+// SetCredential sets or clears the credential; pass nil to clear.
+func (r *Registry) SetCredential(c ICredential) {
+	if c == nil {
+		r.CredentialType = ""
+		r.AuthInfo = ""
+		return
+	}
+	r.CredentialType = c.Type()
+	r.AuthInfo = c.String()
+}
+
 type IRegistryRepo interface {
 	ListRegistries(ctx context.Context, page, pageSize int, search string) ([]*Registry, int64, error)
 	GetRegistry(ctx context.Context, id int) (*Registry, error)
 	CreateRegistry(ctx context.Context, registry Registry) (*Registry, error)
 	UpdateRegistry(ctx context.Context, registry Registry) error
 	DeleteRegistry(ctx context.Context, id int) error
+	PingRegistry(ctx context.Context, reg Registry) (int, string, error)
 }

@@ -2349,21 +2349,21 @@ var _ interface {
 	ErrorName() string
 } = GetModelTreeRequestValidationError{}
 
-// Validate checks the field values on Files with the rules defined in the
-// proto definition for this message. If any rules are violated, the first
-// error encountered is returned, or nil if there are no violations.
-func (m *Files) Validate() error {
+// Validate checks the field values on File with the rules defined in the proto
+// definition for this message. If any rules are violated, the first error
+// encountered is returned, or nil if there are no violations.
+func (m *File) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on Files with the rules defined in the
+// ValidateAll checks the field values on File with the rules defined in the
 // proto definition for this message. If any rules are violated, the result is
-// a list of violation errors wrapped in FilesMultiError, or nil if none found.
-func (m *Files) ValidateAll() error {
+// a list of violation errors wrapped in FileMultiError, or nil if none found.
+func (m *File) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *Files) validate(all bool) error {
+func (m *File) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -2386,7 +2386,7 @@ func (m *Files) validate(all bool) error {
 		switch v := interface{}(m.GetCommit()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, FilesValidationError{
+				errors = append(errors, FileValidationError{
 					field:  "Commit",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -2394,7 +2394,7 @@ func (m *Files) validate(all bool) error {
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, FilesValidationError{
+				errors = append(errors, FileValidationError{
 					field:  "Commit",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -2403,7 +2403,7 @@ func (m *Files) validate(all bool) error {
 		}
 	} else if v, ok := interface{}(m.GetCommit()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return FilesValidationError{
+			return FileValidationError{
 				field:  "Commit",
 				reason: "embedded message failed validation",
 				cause:  err,
@@ -2411,19 +2411,21 @@ func (m *Files) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for Url
+
 	if len(errors) > 0 {
-		return FilesMultiError(errors)
+		return FileMultiError(errors)
 	}
 
 	return nil
 }
 
-// FilesMultiError is an error wrapping multiple validation errors returned by
-// Files.ValidateAll() if the designated constraints aren't met.
-type FilesMultiError []error
+// FileMultiError is an error wrapping multiple validation errors returned by
+// File.ValidateAll() if the designated constraints aren't met.
+type FileMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m FilesMultiError) Error() string {
+func (m FileMultiError) Error() string {
 	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -2432,11 +2434,11 @@ func (m FilesMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m FilesMultiError) AllErrors() []error { return m }
+func (m FileMultiError) AllErrors() []error { return m }
 
-// FilesValidationError is the validation error returned by Files.Validate if
-// the designated constraints aren't met.
-type FilesValidationError struct {
+// FileValidationError is the validation error returned by File.Validate if the
+// designated constraints aren't met.
+type FileValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -2444,22 +2446,22 @@ type FilesValidationError struct {
 }
 
 // Field function returns field value.
-func (e FilesValidationError) Field() string { return e.field }
+func (e FileValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e FilesValidationError) Reason() string { return e.reason }
+func (e FileValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e FilesValidationError) Cause() error { return e.cause }
+func (e FileValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e FilesValidationError) Key() bool { return e.key }
+func (e FileValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e FilesValidationError) ErrorName() string { return "FilesValidationError" }
+func (e FileValidationError) ErrorName() string { return "FileValidationError" }
 
 // Error satisfies the builtin error interface
-func (e FilesValidationError) Error() string {
+func (e FileValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -2471,14 +2473,14 @@ func (e FilesValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sFiles.%s: %s%s",
+		"invalid %sFile.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = FilesValidationError{}
+var _ error = FileValidationError{}
 
 var _ interface {
 	Field() string
@@ -2486,7 +2488,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = FilesValidationError{}
+} = FileValidationError{}
 
 // Validate checks the field values on GetModelTreeResponse with the rules
 // defined in the proto definition for this message. If any rules are
@@ -2751,114 +2753,6 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = GetModelBlobRequestValidationError{}
-
-// Validate checks the field values on GetModelBlobResponse with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
-func (m *GetModelBlobResponse) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on GetModelBlobResponse with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// GetModelBlobResponseMultiError, or nil if none found.
-func (m *GetModelBlobResponse) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *GetModelBlobResponse) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	// no validation rules for Lfs
-
-	// no validation rules for Content
-
-	// no validation rules for Url
-
-	if len(errors) > 0 {
-		return GetModelBlobResponseMultiError(errors)
-	}
-
-	return nil
-}
-
-// GetModelBlobResponseMultiError is an error wrapping multiple validation
-// errors returned by GetModelBlobResponse.ValidateAll() if the designated
-// constraints aren't met.
-type GetModelBlobResponseMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m GetModelBlobResponseMultiError) Error() string {
-	msgs := make([]string, 0, len(m))
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m GetModelBlobResponseMultiError) AllErrors() []error { return m }
-
-// GetModelBlobResponseValidationError is the validation error returned by
-// GetModelBlobResponse.Validate if the designated constraints aren't met.
-type GetModelBlobResponseValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e GetModelBlobResponseValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e GetModelBlobResponseValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e GetModelBlobResponseValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e GetModelBlobResponseValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e GetModelBlobResponseValidationError) ErrorName() string {
-	return "GetModelBlobResponseValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e GetModelBlobResponseValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sGetModelBlobResponse.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = GetModelBlobResponseValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = GetModelBlobResponseValidationError{}
 
 // Validate checks the field values on Model with the rules defined in the
 // proto definition for this message. If any rules are violated, the first
@@ -3280,11 +3174,11 @@ func (m *Commit) validate(all bool) error {
 
 	// no validation rules for CommitterEmail
 
+	// no validation rules for CommitterDate
+
 	// no validation rules for Diff
 
 	// no validation rules for CreatedAt
-
-	// no validation rules for UpdatedAt
 
 	if len(errors) > 0 {
 		return CommitMultiError(errors)
@@ -3362,112 +3256,6 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = CommitValidationError{}
-
-// Validate checks the field values on Diff with the rules defined in the proto
-// definition for this message. If any rules are violated, the first error
-// encountered is returned, or nil if there are no violations.
-func (m *Diff) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on Diff with the rules defined in the
-// proto definition for this message. If any rules are violated, the result is
-// a list of violation errors wrapped in DiffMultiError, or nil if none found.
-func (m *Diff) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *Diff) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	// no validation rules for Diff
-
-	// no validation rules for Deleted
-
-	// no validation rules for NewPath
-
-	// no validation rules for OldPath
-
-	if len(errors) > 0 {
-		return DiffMultiError(errors)
-	}
-
-	return nil
-}
-
-// DiffMultiError is an error wrapping multiple validation errors returned by
-// Diff.ValidateAll() if the designated constraints aren't met.
-type DiffMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m DiffMultiError) Error() string {
-	msgs := make([]string, 0, len(m))
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m DiffMultiError) AllErrors() []error { return m }
-
-// DiffValidationError is the validation error returned by Diff.Validate if the
-// designated constraints aren't met.
-type DiffValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e DiffValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e DiffValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e DiffValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e DiffValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e DiffValidationError) ErrorName() string { return "DiffValidationError" }
-
-// Error satisfies the builtin error interface
-func (e DiffValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sDiff.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = DiffValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = DiffValidationError{}
 
 // Validate checks the field values on Label with the rules defined in the
 // proto definition for this message. If any rules are violated, the first

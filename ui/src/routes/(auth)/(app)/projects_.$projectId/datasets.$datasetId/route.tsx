@@ -7,6 +7,10 @@ import {
 import { type Dataset } from '@matrixhub/api-ts/v1alpha1/dataset.pb.ts'
 import { Category } from '@matrixhub/api-ts/v1alpha1/model.pb'
 import {
+  IconCloudUpload as UploadIcon,
+  IconDownload as DownloadIcon,
+} from '@tabler/icons-react'
+import {
   Outlet,
   Link,
   createFileRoute,
@@ -15,9 +19,9 @@ import {
 } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 
-import DownloadIcon from '@/assets/svgs/download.svg?react'
-import UploadIcon from '@/assets/svgs/upload-cloud.svg?react'
-import { ResourceDetailHeader } from '@/components/ResourceDetailHeader'
+import { projectRolesQueryOptions } from '@/features/auth/auth.query'
+import { queryClient } from '@/queryClient'
+import { ResourceDetailHeader } from '@/shared/components/ResourceDetailHeader'
 
 import { Route as DatasetSettingsRoute } from './settings'
 import { Route as DatasetTreeRoute } from './tree/$ref/$'
@@ -37,42 +41,18 @@ const MOCK_DATA: Dataset = {
   ],
 }
 
-const ProjectsRolesMock = {
-  projectRoles: {
-    project1: 'admin',
-  },
-}
-
 export const Route = createFileRoute(
   '/(auth)/(app)/projects_/$projectId/datasets/$datasetId',
 )({
   component: DatasetLayout,
-  // loader: async ({ params }) => {
-  //   const [datasetRes, prosRoleRes] = await Promise.allSettled([
-  //     Datasets.GetDataset({
-  //       project: params.projectId,
-  //       name: params.datasetId,
-  //     }),
-  //     CurrentUser.GetProjectRoles({}),
-  //   ])
-
-  //   if (datasetRes.status === 'rejected') {
-  //     throw new Error(`Failed to load dataset: ${datasetRes.reason}`)
-  //   }
-
-  //   if (prosRoleRes.status === 'rejected') {
-  //     throw new Error(`Failed to load project roles: ${prosRoleRes.reason}`)
-  //   }
-
-  //   return {
-  //     dataset: datasetRes.value,
-  //     projectRoles: prosRoleRes.value,
-  //   }
-  // },
   loader: async () => {
+    const projectRoles = await queryClient.ensureQueryData(projectRolesQueryOptions())
+    // TODO fetch dataset detail data, if the project is private and user has no access, will throw error
+    // throw new NotFoundRouteError()
+
     return {
       dataset: MOCK_DATA,
-      projectRoles: ProjectsRolesMock,
+      projectRoles: projectRoles,
     }
   },
 })
@@ -85,7 +65,7 @@ function DatasetLayout() {
   } = Route.useParams()
 
   const {
-    dataset, projectRoles,
+    projectRoles,
   } = Route.useLoaderData()
 
   const hasProjectRole = Object.hasOwn(projectRoles.projectRoles ?? {}, projectId)
@@ -136,13 +116,24 @@ function DatasetLayout() {
         <ResourceDetailHeader
           projectId={projectId}
           name={datasetId}
-          size={dataset.size}
-          updatedAt={dataset.updatedAt}
-          labels={dataset.labels}
           actions={(
             <>
-              <Button size="xs" color="cyan" variant="light" leftSection={<UploadIcon fill="cyan" />}>{t('dataset.uploadFiles')}</Button>
-              <Button size="xs" color="cyan" variant="light" leftSection={<DownloadIcon fill="cyan" />}>{t('dataset.downloadDataset')}</Button>
+              <Button
+                size="xs"
+                color="cyan"
+                variant="light"
+                leftSection={<UploadIcon size={16} />}
+              >
+                {t('dataset.uploadFiles')}
+              </Button>
+              <Button
+                size="xs"
+                color="cyan"
+                variant="light"
+                leftSection={<DownloadIcon size={16} />}
+              >
+                {t('dataset.downloadDataset')}
+              </Button>
             </>
           )}
         />
@@ -176,15 +167,8 @@ function DatasetLayout() {
       </Tabs>
       <Space h="md" />
       <div>
-        {
-          activeTab === 'desc'
-            ? (
-                <div>
-                  Dataset Description Page
-                </div>
-              )
-            : <Outlet />
-        }
+        {activeTab === 'desc' && <div>Description Page</div>}
+        <Outlet />
       </div>
     </Box>
   )

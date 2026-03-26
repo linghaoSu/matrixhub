@@ -1,8 +1,31 @@
 {
   "search": "搜索",
   "refresh": "刷新",
-  "batchDelete": "删除已选 {{count}} 项",
+  "batchDeleteWithCount": "删除已选 {{count}} 项",
+  "batchDelete": "批量删除",
   "total": "共 {{count}} 条",
   "sortOrderAsc": "升序",
-  "sortOrderDesc": "降序"
+  "sortOrderDesc": "降序",
+  "copyValueButton": {
+    "copy": "复制",
+    "copied": "已复制"
+  },
+  "commitsTable": {
+    "columns": {
+      "message": "提交记录"
+    },
+    "actions": {
+      "detail": "详情"
+    }
+  },
+  "components": {
+    "RouterErrorComponent": {
+      "somethingWentWrong": "出错了",
+      "reload": "重新加载",
+      "backToHome": "返回首页"
+    },
+    "RouterPendingComponent": {
+      "loading": "加载中..."
+    }
+  }
 }

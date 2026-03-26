@@ -87,7 +87,7 @@ export type GetDatasetTreeRequest = {
 }
 
 export type GetDatasetTreeResponse = {
-  items?: MatrixhubV1alpha1Model.Files[]
+  items?: MatrixhubV1alpha1Model.File[]
 }
 
 export type GetDatasetBlobRequest = {
@@ -95,12 +95,6 @@ export type GetDatasetBlobRequest = {
   name?: string
   revision?: string
   path?: string
-}
-
-export type GetDatasetBlobResponse = {
-  lfs?: boolean
-  content?: string
-  url?: string
 }
 
 export type Dataset = {
@@ -145,7 +139,7 @@ export class Datasets {
   static GetDatasetTree(req: GetDatasetTreeRequest, initReq?: fm.InitReq): Promise<GetDatasetTreeResponse> {
     return fm.fetchReq<GetDatasetTreeRequest, GetDatasetTreeResponse>(`/api/v1alpha1/datasets/${req["project"]}/${req["name"]}/tree?${fm.renderURLSearchParams(req, ["project", "name"])}`, {...initReq, method: "GET"})
   }
-  static GetDatasetBlob(req: GetDatasetBlobRequest, initReq?: fm.InitReq): Promise<GetDatasetBlobResponse> {
-    return fm.fetchReq<GetDatasetBlobRequest, GetDatasetBlobResponse>(`/api/v1alpha1/datasets/${req["project"]}/${req["name"]}/blob?${fm.renderURLSearchParams(req, ["project", "name"])}`, {...initReq, method: "GET"})
+  static GetDatasetBlob(req: GetDatasetBlobRequest, initReq?: fm.InitReq): Promise<MatrixhubV1alpha1Model.File> {
+    return fm.fetchReq<GetDatasetBlobRequest, MatrixhubV1alpha1Model.File>(`/api/v1alpha1/datasets/${req["project"]}/${req["name"]}/blob?${fm.renderURLSearchParams(req, ["project", "name"])}`, {...initReq, method: "GET"})
   }
 }

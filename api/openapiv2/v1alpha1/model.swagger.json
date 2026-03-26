@@ -239,7 +239,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1alpha1GetModelBlobResponse"
+              "$ref": "#/definitions/v1alpha1File"
             }
           },
           "default": {
@@ -524,7 +524,10 @@
       "type": "string",
       "enum": [
         "TASK",
-        "LIBRARY"
+        "LIBRARY",
+        "LICENSE",
+        "LANGUAGE",
+        "OTHER"
       ],
       "default": "TASK"
     },
@@ -563,13 +566,13 @@
         "committerEmail": {
           "type": "string"
         },
+        "committerDate": {
+          "type": "string"
+        },
         "diff": {
           "type": "string"
         },
         "createdAt": {
-          "type": "string"
-        },
-        "updatedAt": {
           "type": "string"
         }
       }
@@ -591,15 +594,7 @@
     "v1alpha1DeleteModelResponse": {
       "type": "object"
     },
-    "v1alpha1FileType": {
-      "type": "string",
-      "enum": [
-        "DIR",
-        "FILE"
-      ],
-      "default": "DIR"
-    },
-    "v1alpha1Files": {
+    "v1alpha1File": {
       "type": "object",
       "properties": {
         "name": {
@@ -624,22 +619,19 @@
         "commit": {
           "$ref": "#/definitions/v1alpha1Commit",
           "title": "commit with out diffs\nonly file type have commit"
-        }
-      }
-    },
-    "v1alpha1GetModelBlobResponse": {
-      "type": "object",
-      "properties": {
-        "lfs": {
-          "type": "boolean"
-        },
-        "content": {
-          "type": "string"
         },
         "url": {
           "type": "string"
         }
       }
+    },
+    "v1alpha1FileType": {
+      "type": "string",
+      "enum": [
+        "DIR",
+        "FILE"
+      ],
+      "default": "DIR"
     },
     "v1alpha1GetModelTreeResponse": {
       "type": "object",
@@ -648,7 +640,7 @@
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/v1alpha1Files"
+            "$ref": "#/definitions/v1alpha1File"
           }
         }
       }

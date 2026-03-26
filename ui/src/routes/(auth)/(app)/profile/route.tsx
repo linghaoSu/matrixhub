@@ -1,6 +1,7 @@
 import {
   Box, Group, Stack, Tabs, Text,
 } from '@mantine/core'
+import { IconUser } from '@tabler/icons-react'
 import {
   createFileRoute, Link, linkOptions, Outlet, useMatchRoute,
 } from '@tanstack/react-router'
@@ -8,8 +9,7 @@ import { use } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import DefaultAvatarIcon from '@/assets/svgs/default-avatar.svg?react'
-import UserIcon from '@/assets/svgs/user.svg?react'
-import { CurrentUserContext } from '@/context/current-user-context.tsx'
+import { CurrentUserContext } from '@/context/current-user-context'
 import { Route as AccessTokenRoute } from '@/routes/(auth)/(app)/profile/access-token'
 import { Route as SecurityRoute } from '@/routes/(auth)/(app)/profile/security'
 
@@ -40,10 +40,7 @@ function Profile() {
   return (
     <Stack gap="lg">
       <Group gap="xs">
-        <UserIcon
-          width={32}
-          height={32}
-        />
+        <IconUser size={32} />
         <Text
           size="lg"
           fw={600}
@@ -77,7 +74,6 @@ function Profile() {
             label, value, ...linkProps
           }) => {
             return (
-              // TODO: tab style should keep same in different page
               <Tabs.Tab
                 key={value}
                 value={value}

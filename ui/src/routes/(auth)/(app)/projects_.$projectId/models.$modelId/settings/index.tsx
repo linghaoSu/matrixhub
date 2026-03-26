@@ -1,27 +1,28 @@
 import { createFileRoute } from '@tanstack/react-router'
 
+import { ModelSettingsPage } from '@/features/models/pages/ModelSettingsPage'
+import { ensureProjectAccess } from '@/utils/routerAccess'
+
 export const Route = createFileRoute(
   '/(auth)/(app)/projects_/$projectId/models/$modelId/settings/',
 )({
-  component: RouteComponent,
+  beforeLoad: async ({ params }) => {
+    // only public project and user has no role for the this project,
+    // will return 403
+    await ensureProjectAccess(params.projectId)
+  },
+  component: ModelSettings,
 })
 
-function RouteComponent() {
+function ModelSettings() {
   const {
     projectId, modelId,
   } = Route.useParams()
 
   return (
-    <div>
-      Model Settings Form
-      <br />
-      Project ID:
-      {' '}
-      {projectId}
-      <br />
-      Model ID:
-      {' '}
-      {modelId}
-    </div>
+    <ModelSettingsPage
+      projectId={projectId}
+      modelId={modelId}
+    />
   )
 }

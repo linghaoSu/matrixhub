@@ -46,7 +46,7 @@ type ModelsClient interface {
 	ListModelCommits(ctx context.Context, in *ListModelCommitsRequest, opts ...grpc.CallOption) (*ListModelCommitsResponse, error)
 	GetModelCommit(ctx context.Context, in *GetModelCommitRequest, opts ...grpc.CallOption) (*Commit, error)
 	GetModelTree(ctx context.Context, in *GetModelTreeRequest, opts ...grpc.CallOption) (*GetModelTreeResponse, error)
-	GetModelBlob(ctx context.Context, in *GetModelBlobRequest, opts ...grpc.CallOption) (*GetModelBlobResponse, error)
+	GetModelBlob(ctx context.Context, in *GetModelBlobRequest, opts ...grpc.CallOption) (*File, error)
 }
 
 type modelsClient struct {
@@ -157,9 +157,9 @@ func (c *modelsClient) GetModelTree(ctx context.Context, in *GetModelTreeRequest
 	return out, nil
 }
 
-func (c *modelsClient) GetModelBlob(ctx context.Context, in *GetModelBlobRequest, opts ...grpc.CallOption) (*GetModelBlobResponse, error) {
+func (c *modelsClient) GetModelBlob(ctx context.Context, in *GetModelBlobRequest, opts ...grpc.CallOption) (*File, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetModelBlobResponse)
+	out := new(File)
 	err := c.cc.Invoke(ctx, Models_GetModelBlob_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -181,7 +181,7 @@ type ModelsServer interface {
 	ListModelCommits(context.Context, *ListModelCommitsRequest) (*ListModelCommitsResponse, error)
 	GetModelCommit(context.Context, *GetModelCommitRequest) (*Commit, error)
 	GetModelTree(context.Context, *GetModelTreeRequest) (*GetModelTreeResponse, error)
-	GetModelBlob(context.Context, *GetModelBlobRequest) (*GetModelBlobResponse, error)
+	GetModelBlob(context.Context, *GetModelBlobRequest) (*File, error)
 }
 
 // UnimplementedModelsServer should be embedded to have
@@ -221,7 +221,7 @@ func (UnimplementedModelsServer) GetModelCommit(context.Context, *GetModelCommit
 func (UnimplementedModelsServer) GetModelTree(context.Context, *GetModelTreeRequest) (*GetModelTreeResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetModelTree not implemented")
 }
-func (UnimplementedModelsServer) GetModelBlob(context.Context, *GetModelBlobRequest) (*GetModelBlobResponse, error) {
+func (UnimplementedModelsServer) GetModelBlob(context.Context, *GetModelBlobRequest) (*File, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetModelBlob not implemented")
 }
 func (UnimplementedModelsServer) testEmbeddedByValue() {}

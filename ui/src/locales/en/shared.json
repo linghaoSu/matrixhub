@@ -1,8 +1,31 @@
 {
   "search": "Search",
   "refresh": "Refresh",
-  "batchDelete": "Delete {{count}} selected",
+  "batchDeleteWithCount": "Delete {{count}} selected",
+  "batchDelete": "Batch Delete",
   "total": "Total {{count}}",
   "sortOrderAsc": "Asc",
-  "sortOrderDesc": "Desc"
+  "sortOrderDesc": "Desc",
+  "copyValueButton": {
+    "copy": "Copy",
+    "copied": "Copied"
+  },
+  "commitsTable": {
+    "columns": {
+      "message": "Commit Message"
+    },
+    "actions": {
+      "detail": "Detail"
+    }
+  },
+  "components": {
+    "RouterErrorComponent": {
+      "somethingWentWrong": "Something went wrong",
+      "reload": "Reload",
+      "backToHome": "Back to Home"
+    },
+    "RouterPendingComponent": {
+      "loading": "Loading..."
+    }
+  }
 }

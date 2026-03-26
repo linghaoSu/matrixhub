@@ -1,20 +1,19 @@
+import {
+  Category, type Label, type Model,
+} from '@matrixhub/api-ts/v1alpha1/model.pb'
+import {
+  IconClock, IconCube, IconApiApp,
+} from '@tabler/icons-react'
 import { filesize } from 'filesize'
 import humanFormat from 'human-format'
 
-import ClockIcon from '@/assets/svgs/clock.svg?react'
-import ModelIcon from '@/assets/svgs/model.svg?react'
-import ProjectIcon from '@/assets/svgs/project.svg?react'
+import i18n from '@/i18n'
+import { LibraryBadge } from '@/shared/components/badges/LibraryBadge'
+import { ParameterCountBadge } from '@/shared/components/badges/ParameterCountBadge'
+import { TaskBadge } from '@/shared/components/badges/TaskBadge'
 import { formatDateTime } from '@/shared/utils/date'
 
-import type {
-  ResourceCardBadge,
-  ResourceCardMetaItem,
-} from '@/shared/components/ResourceCard'
-import type {
-  Category,
-  Label,
-  Model,
-} from '@matrixhub/api-ts/v1alpha1/model.pb'
+import type { ResourceBadge, ResourceMetaItem } from '@/shared/components/resource-card/BaseCard'
 
 export function buildModelTitle(model: Model, projectId: string) {
   const projectName = model.project ?? projectId
@@ -28,36 +27,33 @@ export function buildModelBadges(
   options: {
     taskCategory: Category
     libraryCategory: Category
-    taskIcon: ResourceCardBadge['icon']
-    libraryIconFn: (name: string) => ResourceCardBadge['icon']
-    parameterCountIcon: ResourceCardBadge['icon']
+  } = {
+    taskCategory: Category.TASK,
+    libraryCategory: Category.LIBRARY,
   },
-): ResourceCardBadge[] {
-  const badges: ResourceCardBadge[] = []
+): ResourceBadge[] {
+  const badges: ResourceBadge[] = []
   const taskLabels = getLabelsByCategory(model.labels, options.taskCategory)
   const libraryLabels = getLabelsByCategory(model.labels, options.libraryCategory)
 
   for (const name of taskLabels) {
     badges.push({
       key: `task-${name}`,
-      icon: options.taskIcon,
-      label: name,
+      content: <TaskBadge task={name} maw={132} />,
     })
   }
 
   for (const name of libraryLabels) {
     badges.push({
       key: `library-${name}`,
-      icon: options.libraryIconFn(name),
-      label: name,
+      content: <LibraryBadge library={name} maw={132} />,
     })
   }
 
   if (model.parameterCount) {
     badges.push({
       key: 'parameterCount',
-      icon: options.parameterCountIcon,
-      label: formatParameterCount(model.parameterCount),
+      content: <ParameterCountBadge parameterCount={formatParameterCount(model.parameterCount)} maw={132} />,
     })
   }
 
@@ -68,25 +64,28 @@ export function buildModelMetaItems(
   model: Model,
   projectId: string,
   options?: {
-    projectIcon?: ResourceCardMetaItem['icon']
-    sizeIcon?: ResourceCardMetaItem['icon']
-    updatedAtIcon?: ResourceCardMetaItem['icon']
+    projectIcon?: ResourceMetaItem['icon']
+    sizeIcon?: ResourceMetaItem['icon']
+    updatedAtIcon?: ResourceMetaItem['icon']
   },
-): ResourceCardMetaItem[] {
+): ResourceMetaItem[] {
   return [
     {
       key: 'project',
-      icon: options?.projectIcon ?? <ProjectIcon width={20} height={20} />,
+      label: i18n.t('common.fromProject'),
+      icon: options?.projectIcon ?? <IconApiApp size={20} />,
       value: model.project ?? projectId,
     },
     {
       key: 'size',
-      icon: options?.sizeIcon ?? <ModelIcon width={20} height={20} />,
+      label: i18n.t('common.modelSize'),
+      icon: options?.sizeIcon ?? <IconCube size={20} />,
       value: formatStorageSize(model.size),
     },
     {
       key: 'updatedAt',
-      icon: options?.updatedAtIcon ?? <ClockIcon width={20} height={20} />,
+      label: i18n.t('common.updatedAt'),
+      icon: options?.updatedAtIcon ?? <IconClock size={20} />,
       value: formatDateTime(model.updatedAt),
     },
   ]

@@ -22,9 +22,10 @@ import (
 type AccessToken struct {
 	Id        string `gorm:"primary_key"`
 	Name      string
-	UserId    string
+	UserId    int
 	Content   string
 	Enabled   bool
+	CreatedAt time.Time
 	ExpiredAt *time.Time
 }
 
@@ -36,9 +37,9 @@ func (AccessToken) TableName() string {
 	return "access_tokens"
 }
 
-type IAccessTokenRepository interface {
-	GetAccessToken(ctx context.Context, id string) (*AccessToken, error)
-	ListUserAccessTokens(ctx context.Context, userId string) ([]*AccessToken, error)
+type IAccessTokenRepo interface {
+	GetAccessToken(ctx context.Context, userId int, id string) (*AccessToken, error)
+	ListUserAccessTokens(ctx context.Context, userId int) ([]*AccessToken, error)
 	CreateAccessToken(ctx context.Context, token AccessToken) error
-	DeleteAccessToken(ctx context.Context, id string) error
+	DeleteAccessToken(ctx context.Context, userId int, id string) error
 }

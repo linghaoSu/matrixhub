@@ -62,7 +62,7 @@ export type GetCurrentUserRequest = {
 }
 
 export type GetCurrentUserResponse = {
-  id?: string
+  id?: number
   username?: string
   isAdmin?: boolean
 }

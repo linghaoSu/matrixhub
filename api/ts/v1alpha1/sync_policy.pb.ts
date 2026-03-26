@@ -50,6 +50,7 @@ export type PullBasePolicy = {
   resourceTypes?: ResourceType[]
   targetResourceName?: string
   sourceRegistry?: MatrixhubV1alpha1Registry.Registry
+  targetProjectName?: string
 }
 
 export type PushBasePolicy = {
@@ -58,6 +59,7 @@ export type PushBasePolicy = {
   targetRegistryId?: number
   targetResourceName?: string
   targetRegistry?: MatrixhubV1alpha1Registry.Registry
+  targetProjectName?: string
 }
 
 

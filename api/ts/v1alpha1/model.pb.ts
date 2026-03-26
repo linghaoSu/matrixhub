@@ -15,6 +15,9 @@ export enum FileType {
 export enum Category {
   TASK = "TASK",
   LIBRARY = "LIBRARY",
+  LICENSE = "LICENSE",
+  LANGUAGE = "LANGUAGE",
+  OTHER = "OTHER",
 }
 
 export type ListModelTaskLabelsRequest = {
@@ -108,7 +111,7 @@ export type GetModelTreeRequest = {
   path?: string
 }
 
-export type Files = {
+export type File = {
   name?: string
   type?: FileType
   path?: string
@@ -116,10 +119,11 @@ export type Files = {
   lfs?: boolean
   sha256?: string
   commit?: Commit
+  url?: string
 }
 
 export type GetModelTreeResponse = {
-  items?: Files[]
+  items?: File[]
 }
 
 export type GetModelBlobRequest = {
@@ -127,12 +131,6 @@ export type GetModelBlobRequest = {
   name?: string
   revision?: string
   path?: string
-}
-
-export type GetModelBlobResponse = {
-  lfs?: boolean
-  content?: string
-  url?: string
 }
 
 export type Model = {
@@ -167,16 +165,9 @@ export type Commit = {
   authorDate?: string
   committerName?: string
   committerEmail?: string
+  committerDate?: string
   diff?: string
   createdAt?: string
-  updatedAt?: string
-}
-
-export type Diff = {
-  diff?: string
-  deleted?: boolean
-  newPath?: string
-  oldPath?: string
 }
 
 export type Label = {
@@ -218,7 +209,7 @@ export class Models {
   static GetModelTree(req: GetModelTreeRequest, initReq?: fm.InitReq): Promise<GetModelTreeResponse> {
     return fm.fetchReq<GetModelTreeRequest, GetModelTreeResponse>(`/api/v1alpha1/models/${req["project"]}/${req["name"]}/tree?${fm.renderURLSearchParams(req, ["project", "name"])}`, {...initReq, method: "GET"})
   }
-  static GetModelBlob(req: GetModelBlobRequest, initReq?: fm.InitReq): Promise<GetModelBlobResponse> {
-    return fm.fetchReq<GetModelBlobRequest, GetModelBlobResponse>(`/api/v1alpha1/models/${req["project"]}/${req["name"]}/blob?${fm.renderURLSearchParams(req, ["project", "name"])}`, {...initReq, method: "GET"})
+  static GetModelBlob(req: GetModelBlobRequest, initReq?: fm.InitReq): Promise<File> {
+    return fm.fetchReq<GetModelBlobRequest, File>(`/api/v1alpha1/models/${req["project"]}/${req["name"]}/blob?${fm.renderURLSearchParams(req, ["project", "name"])}`, {...initReq, method: "GET"})
   }
 }

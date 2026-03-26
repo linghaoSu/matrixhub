@@ -1,9 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-export const Route = createFileRoute('/(auth)/(app)/profile/access-token')({
-  component: RouteComponent,
-})
+import { AccessTokenPage } from '@/features/profile/pages/AccessTokenPage'
+import { accessTokensQueryOptions } from '@/features/profile/profile.query'
 
-function RouteComponent() {
-  return <div>Hello "/(auth)/(app)/profile/access-token"!</div>
-}
+export const Route = createFileRoute('/(auth)/(app)/profile/access-token')({
+  loader: ({ context }) => {
+    context.queryClient.prefetchQuery(accessTokensQueryOptions())
+  },
+  component: AccessTokenPage,
+})

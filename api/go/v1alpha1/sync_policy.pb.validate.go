@@ -92,6 +92,8 @@ func (m *PullBasePolicy) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for TargetProjectName
+
 	if len(errors) > 0 {
 		return PullBasePolicyMultiError(errors)
 	}
@@ -226,6 +228,8 @@ func (m *PushBasePolicy) validate(all bool) error {
 			}
 		}
 	}
+
+	// no validation rules for TargetProjectName
 
 	if len(errors) > 0 {
 		return PushBasePolicyMultiError(errors)

@@ -2,27 +2,39 @@ import {
   AppShell,
   Avatar,
   Flex,
-  Group, Menu,
+  Group,
+  Menu,
   NavLink,
-  Text, UnstyledButton,
+  Text,
+  UnstyledButton,
   rem,
 } from '@mantine/core'
 import {
+  IconChevronDown as ArrowDownIcon,
+  IconCube as ModelIcon,
+  IconDatabase as DatasetIcon,
+  IconLogout as LogOutIcon,
+  IconSettings as SettingsIcon,
+  IconUser as UserIcon,
+  IconApiApp as ProjectIcon,
+} from '@tabler/icons-react'
+import {
   createFileRoute,
-  Link, linkOptions,
-  Outlet, useMatchRoute,
+  Link,
+  linkOptions,
+  Outlet,
+  useMatchRoute,
+  CatchBoundary,
+  ErrorComponent,
+  useRouterState, redirect,
 } from '@tanstack/react-router'
+import { use } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import ArrowDownIcon from '@/assets/svgs/arrow-down.svg?react'
-import DatasetIcon from '@/assets/svgs/dataset.svg?react'
 import LogoIcon from '@/assets/svgs/logo.svg?react'
-import LogOutIcon from '@/assets/svgs/logout.svg?react'
-import ModelIcon from '@/assets/svgs/model.svg?react'
-import ProjectIcon from '@/assets/svgs/project.svg?react'
-import SettingsIcon from '@/assets/svgs/settings.svg?react'
-import UserIcon from '@/assets/svgs/user.svg?react'
-import { LanguageSwitcher } from '@/components/LanguageSwitcher'
+import { CurrentUserContext } from '@/context/current-user-context.tsx'
+import { currentUserQueryOptions } from '@/features/auth/auth.query'
+import { queryClient } from '@/queryClient'
 import { Route as DatasetsRoute } from '@/routes/(auth)/(app)/datasets'
 import { Route as CreateDatasetRoute } from '@/routes/(auth)/(app)/datasets/new'
 import { Route as ModelsRoute } from '@/routes/(auth)/(app)/models'
@@ -32,9 +44,19 @@ import { Route as ProjectsRoute } from '@/routes/(auth)/(app)/projects'
 import { Route as ProjectDatasetRoute } from '@/routes/(auth)/(app)/projects_.$projectId/datasets.$datasetId/route'
 import { Route as ProjectModelRoute } from '@/routes/(auth)/(app)/projects_.$projectId/models.$modelId/route'
 import { Route as AdminRoute } from '@/routes/(auth)/admin'
+import { LanguageSwitcher } from '@/shared/components/LanguageSwitcher'
+import { RouteStatusPage } from '@/shared/components/RouteStatusPage'
+import { isForbiddenRouteError, isNotFoundRouteError } from '@/utils/routerAccess'
 
 export const Route = createFileRoute('/(auth)')({
   component: AuthLayout,
+  beforeLoad: async () => {
+    try {
+      await queryClient.ensureQueryData(currentUserQueryOptions())
+    } catch {
+      throw redirect({ to: '/login' })
+    }
+  },
 })
 
 function AppLogo() {
@@ -116,7 +138,7 @@ function AppNavbar() {
             activeOptions={{ exact: true }}
             leftSection={(
               <route.icon
-                fontSize={rem(20)}
+                size={rem(20)}
               />
             )}
             active={isActive}
@@ -144,7 +166,9 @@ function AppNavbar() {
 
 function AccountMenu() {
   const { t } = useTranslation()
-  const menuItems = linkOptions([
+  const user = use(CurrentUserContext)
+
+  const baseMenuItems = linkOptions([
     {
       label: t('nav.profile'),
       icon: UserIcon,
@@ -160,12 +184,17 @@ function AccountMenu() {
       icon: DatasetIcon,
       to: CreateDatasetRoute.to,
     },
-    {
-      label: t('nav.settings'),
-      icon: SettingsIcon,
-      to: AdminRoute.to,
-    },
   ])
+
+  const adminMenuItem = linkOptions([{
+    label: t('nav.settings'),
+    icon: SettingsIcon,
+    to: AdminRoute.to,
+  }])
+
+  const menuItems = user?.isAdmin
+    ? [...baseMenuItems, ...adminMenuItem]
+    : baseMenuItems
 
   return (
     <Menu
@@ -183,10 +212,10 @@ function AccountMenu() {
               size={24}
             />
             <Text size="sm">
-              Admin
+              {user?.username ?? '...'}
             </Text>
             <ArrowDownIcon
-              fontSize={rem(16)}
+              size={rem(16)}
             />
           </Group>
         </UnstyledButton>
@@ -199,8 +228,8 @@ function AccountMenu() {
               key={item.label}
               leftSection={(
                 <item.icon
-                  fontSize={rem(16)}
-                  color="#868E96"
+                  size={rem(16)}
+                  color="var(--mantine-color-gray-6)"
                 />
               )}
               component={Link}
@@ -213,8 +242,8 @@ function AccountMenu() {
         <Menu.Item
           leftSection={(
             <LogOutIcon
-              fontSize={rem(16)}
-              color="#868E96"
+              size={rem(16)}
+              color="var(--mantine-color-gray-6)"
             />
           )}
         >
@@ -225,7 +254,22 @@ function AccountMenu() {
   )
 }
 
+function AuthErrorComponent({ error }: { error: unknown }) {
+  if (isForbiddenRouteError(error)) {
+    return <RouteStatusPage code={403} />
+  }
+  if (isNotFoundRouteError(error)) {
+    return <RouteStatusPage code={404} />
+  }
+
+  return <ErrorComponent error={error} />
+}
+
 function AuthLayout() {
+  const resetKey = useRouterState({
+    select: s => s.resolvedLocation?.href ?? s.location.href,
+  })
+
   return (
     <AppShell
       mode="static"
@@ -265,7 +309,12 @@ function AuthLayout() {
           },
         }}
       >
-        <Outlet />
+        <CatchBoundary
+          getResetKey={() => resetKey}
+          errorComponent={AuthErrorComponent}
+        >
+          <Outlet />
+        </CatchBoundary>
       </AppShell.Main>
     </AppShell>
   )

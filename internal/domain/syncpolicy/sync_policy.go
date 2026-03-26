@@ -16,28 +16,50 @@ package syncpolicy
 
 import (
 	"context"
+	"time"
 
 	"github.com/matrixhub-ai/matrixhub/internal/domain/syncjob"
 )
 
-// Todo: change it according to requirement
+// SyncPolicyType represents the type of sync policy
+const (
+	SyncPolicyTypePull int = iota + 1
+	SyncPolicyTypePush
+)
+
+// TriggerType represents how the sync is triggered
+const (
+	TriggerTypeManual int = iota + 1
+	TriggerTypeScheduled
+)
+
 type SyncPolicy struct {
-	ID                 int
-	Name               string
-	Description        string
-	RemoteRegistryID   int
-	RemoteProjectName  string
-	RemoteResourceName string
-	ProjectName        string
-	ResourceName       string
-	ResourceType       string
-	SyncType           string
+	ID                 int       `gorm:"primarykey"`
+	Name               string    `gorm:"column:name"`
+	Description        string    `gorm:"column:description"`
+	PolicyType         int       `gorm:"column:policy_type"`          // 1: pull, 2: push
+	TriggerType        int       `gorm:"column:trigger_type"`         // 1: manual, 2: scheduled
+	SourceRegistryID   int       `gorm:"column:source_registry_id"`   // for pull policy
+	ResourceName       string    `gorm:"column:resource_name"`        // source resource name
+	ResourceTypes      string    `gorm:"column:resource_types"`       // comma separated: model,dataset
+	TargetResourceName string    `gorm:"column:target_resource_name"` // target resource name
+	TargetProjectName  string    `gorm:"column:target_project_name"`  // target local project name
+	Bandwidth          string    `gorm:"column:bandwidth"`
+	IsOverwrite        bool      `gorm:"column:is_overwrite"`
+	IsDisabled         bool      `gorm:"column:is_disabled"`
+	CreatedAt          time.Time `gorm:"column:created_at"`
+	UpdatedAt          time.Time `gorm:"column:updated_at"`
+}
+
+func (SyncPolicy) TableName() string {
+	return "sync_policies"
 }
 
 type ISyncPolicyRepo interface {
 	CreateSyncPolicy(ctx context.Context, policy *SyncPolicy) error
-	GetSyncPolicy(ctx context.Context, policy *SyncPolicy) (*SyncPolicy, error)
+	GetSyncPolicy(ctx context.Context, id int) (*SyncPolicy, error)
 	UpdateSyncPolicy(ctx context.Context, policy *SyncPolicy) error
-	DeleteSyncPolicy(ctx context.Context, policy *SyncPolicy) error
+	DeleteSyncPolicy(ctx context.Context, id int) error
+	ListSyncPolicies(ctx context.Context, page, pageSize int, search string) ([]*SyncPolicy, int64, error)
 	GenerateSyncTaskAndSyncJobs(ctx context.Context, policy *SyncPolicy) (*SyncTask, []*syncjob.SyncJob, error)
 }

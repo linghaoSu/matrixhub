@@ -27,6 +27,7 @@ import (
 	"github.com/matrixhub-ai/matrixhub/internal/domain/git"
 	"github.com/matrixhub-ai/matrixhub/internal/domain/model"
 	"github.com/matrixhub-ai/matrixhub/internal/infra/log"
+	"github.com/matrixhub-ai/matrixhub/internal/infra/utils"
 )
 
 type ModelHandler struct {
@@ -50,6 +51,23 @@ func formatParameterCount(count int64) string {
 	return fmt.Sprintf("%d", count)
 }
 
+func labelCategoryToProto(category string) modelv1alpha1.Category {
+	switch category {
+	case "library":
+		return modelv1alpha1.Category_LIBRARY
+	case "license":
+		return modelv1alpha1.Category_LICENSE
+	case "language":
+		return modelv1alpha1.Category_LANGUAGE
+	case "other":
+		return modelv1alpha1.Category_OTHER
+	case "task":
+		return modelv1alpha1.Category_TASK
+	default:
+		return modelv1alpha1.Category_OTHER
+	}
+}
+
 // modelToProto converts domain Model to proto Model
 func modelToProto(m *model.Model) *modelv1alpha1.Model {
 	labels := make([]*modelv1alpha1.Label, len(m.Labels))
@@ -57,13 +75,9 @@ func modelToProto(m *model.Model) *modelv1alpha1.Model {
 		labels[i] = &modelv1alpha1.Label{
 			Id:        int32(l.ID),
 			Name:      l.Name,
-			Category:  modelv1alpha1.Category_TASK, // Default to TASK
+			Category:  labelCategoryToProto(l.Category),
 			CreatedAt: l.CreatedAt.Format(time.RFC3339),
 			UpdatedAt: l.UpdatedAt.Format(time.RFC3339),
-		}
-		// Map category string to proto enum
-		if l.Category == "library" {
-			labels[i].Category = modelv1alpha1.Category_LIBRARY
 		}
 	}
 
@@ -121,20 +135,20 @@ func commitToProto(c *git.Commit) *modelv1alpha1.Commit {
 		AuthorDate:     c.AuthorDate.Format(time.RFC3339),
 		CommitterName:  c.CommitterName,
 		CommitterEmail: c.CommitterEmail,
+		CommitterDate:  c.CommitterDate.Format(time.RFC3339),
 		Diff:           c.Diff,
 		CreatedAt:      c.CreatedAt.Format(time.RFC3339),
-		UpdatedAt:      c.UpdatedAt.Format(time.RFC3339),
 	}
 }
 
-// treeEntryToProtoFile converts domain git.TreeEntry to proto Files
-func treeEntryToProtoFile(entry *git.TreeEntry) *modelv1alpha1.Files {
+// treeEntryToProtoFile converts domain git.TreeEntry to proto File
+func treeEntryToProtoFile(entry *git.TreeEntry) *modelv1alpha1.File {
 	var protoCommit *modelv1alpha1.Commit
 	if entry.Commit != nil {
 		protoCommit = commitToProto(entry.Commit)
 	}
 
-	return &modelv1alpha1.Files{
+	return &modelv1alpha1.File{
 		Name:   entry.Name,
 		Type:   modelv1alpha1.FileType(entry.Type),
 		Path:   entry.Path,
@@ -142,6 +156,7 @@ func treeEntryToProtoFile(entry *git.TreeEntry) *modelv1alpha1.Files {
 		Lfs:    entry.IsLFS,
 		Sha256: entry.Hash,
 		Commit: protoCommit,
+		Url:    entry.URL,
 	}
 }
 
@@ -233,6 +248,7 @@ func (mh *ModelHandler) ListModels(ctx context.Context, request *modelv1alpha1.L
 			Total:    int32(total),
 			Page:     request.Page,
 			PageSize: request.PageSize,
+			Pages:    utils.CalculatePages(total, request.PageSize),
 		},
 	}, nil
 }
@@ -342,6 +358,7 @@ func (mh *ModelHandler) ListModelCommits(ctx context.Context, request *modelv1al
 			Total:    int32(total),
 			Page:     request.Page,
 			PageSize: request.PageSize,
+			Pages:    utils.CalculatePages(total, request.PageSize),
 		},
 	}, nil
 }
@@ -380,7 +397,7 @@ func (mh *ModelHandler) GetModelTree(ctx context.Context, request *modelv1alpha1
 	}
 
 	// Convert to proto
-	items := make([]*modelv1alpha1.Files, len(entries))
+	items := make([]*modelv1alpha1.File, len(entries))
 	for i, entry := range entries {
 		items[i] = treeEntryToProtoFile(entry)
 	}
@@ -390,6 +407,22 @@ func (mh *ModelHandler) GetModelTree(ctx context.Context, request *modelv1alpha1
 	}, nil
 }
 
-func (mh *ModelHandler) GetModelBlob(ctx context.Context, request *modelv1alpha1.GetModelBlobRequest) (*modelv1alpha1.GetModelBlobResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "Not implemented")
+func (mh *ModelHandler) GetModelBlob(ctx context.Context, request *modelv1alpha1.GetModelBlobRequest) (*modelv1alpha1.File, error) {
+	if err := request.ValidateAll(); err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	entry, err := mh.ms.GetModelBlob(ctx, request.Project, request.Name, request.Revision, request.Path)
+	if err != nil {
+		if strings.Contains(err.Error(), "not found") || strings.Contains(err.Error(), "does not exist") {
+			return nil, status.Error(codes.NotFound, err.Error())
+		}
+		return nil, status.Error(codes.Internal, "failed to get blob")
+	}
+
+	if entry.Type == git.FileTypeDir {
+		return nil, status.Error(codes.InvalidArgument, "path must reference a file blob")
+	}
+
+	return treeEntryToProtoFile(entry), nil
 }

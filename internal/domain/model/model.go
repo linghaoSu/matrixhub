@@ -56,6 +56,13 @@ type Filter struct {
 	Popular  *bool // filter by popular flag (true = only popular, false/nil = all)
 }
 
+// MetadataUpdate contains optional fields for updating model metadata.
+type MetadataUpdate struct {
+	ReadmeContent  *string
+	Size           *int64
+	ParameterCount *int64
+}
+
 // IModelRepo defines the repository interface for model operations.
 type IModelRepo interface {
 	// Create creates a new model in the database.
@@ -69,10 +76,19 @@ type IModelRepo interface {
 
 	// Delete removes a model from the database by its project and name.
 	Delete(ctx context.Context, project, name string) error
+
+	// UpdateMetadata updates selected metadata fields for a model.
+	UpdateMetadata(ctx context.Context, modelID int64, update *MetadataUpdate) error
 }
 
 // ILabelRepo defines the repository interface for label operations.
 type ILabelRepo interface {
 	ListByCategoryAndScope(ctx context.Context, category, scope string) ([]*Label, error)
 	GetByModelID(ctx context.Context, modelID int64) ([]*Label, error)
+
+	// GetOrCreateByName finds or creates a label by name, category and scope.
+	GetOrCreateByName(ctx context.Context, name, category, scope string) (*Label, error)
+
+	// UpdateModelLabels replaces all label associations for a model.
+	UpdateModelLabels(ctx context.Context, modelID int64, labelIDs []int) error
 }

@@ -4,14 +4,35 @@ import {
 import { lazy, Suspense } from 'react'
 
 import { CurrentUserContext } from '@/context/current-user-context.tsx'
+import { currentUserQueryOptions } from '@/features/auth/auth.query'
 import i18n from '@/i18n'
+import { queryClient } from '@/queryClient'
 
 import type { QueryClient } from '@tanstack/react-query'
 
-const TanStackRouterDevtools = import.meta.env.DEV
+const TanStackDevtools = import.meta.env.DEV
   ? lazy(() =>
-      import('@tanstack/react-router-devtools').then(m => ({
-        default: m.TanStackRouterDevtools,
+      Promise.all([
+        import('@tanstack/react-devtools'),
+        import('@tanstack/react-query-devtools'),
+        import('@tanstack/react-router-devtools'),
+        import('@tanstack/react-form-devtools'),
+      ]).then(([devtools, queryDevtools, routerDevtools, formDevtools]) => ({
+        default: () => (
+          <devtools.TanStackDevtools
+            plugins={[
+              {
+                name: 'TanStack Query',
+                render: <queryDevtools.ReactQueryDevtoolsPanel />,
+              },
+              {
+                name: 'TanStack Router',
+                render: <routerDevtools.TanStackRouterDevtoolsPanel />,
+              },
+              formDevtools.formDevtoolsPlugin(),
+            ]}
+          />
+        ),
       })),
     )
   : () => null
@@ -20,9 +41,11 @@ export const Route = createRootRouteWithContext<{
   queryClient: QueryClient
 }>()({
   loader: async () => {
-    // TODO: Add error handling
-    // return await CurrentUser.GetCurrentUser({})
-    return { username: 'Admin' }
+    try {
+      return await queryClient.ensureQueryData(currentUserQueryOptions())
+    } catch {
+      return undefined
+    }
   },
   component: RootComponent,
   head: () => ({
@@ -48,7 +71,7 @@ function RootComponent() {
         <Outlet />
       </CurrentUserContext>
       <Suspense fallback={null}>
-        <TanStackRouterDevtools initialIsOpen={false} />
+        <TanStackDevtools />
       </Suspense>
     </>
   )

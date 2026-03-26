@@ -185,9 +185,22 @@ func (m *modelDB) GetByProjectAndName(ctx context.Context, project, name string)
 		First(&mod).Error
 
 	if err != nil {
-		fmt.Println(err.Error())
 		return nil, fmt.Errorf("failed to get model: %w", err)
 	}
+
+	var labels []model.Label
+	err = m.db.WithContext(ctx).
+		Table("models_labels ml").
+		Select("l.*").
+		Joins("INNER JOIN labels l ON ml.label_id = l.id").
+		Where("ml.model_id = ?", mod.ID).
+		Find(&labels).Error
+	if err != nil {
+		return nil, fmt.Errorf("failed to get model labels: %w", err)
+	}
+
+	mod.Labels = labels
+
 	return &mod, nil
 }
 
@@ -208,4 +221,30 @@ func (m *modelDB) Delete(ctx context.Context, project, name string) error {
 	}
 
 	return nil
+}
+
+// UpdateMetadata updates selected metadata fields for a model.
+func (m *modelDB) UpdateMetadata(ctx context.Context, modelID int64, update *model.MetadataUpdate) error {
+	updates := make(map[string]interface{})
+
+	if update.ReadmeContent != nil {
+		updates["readme_content"] = *update.ReadmeContent
+	}
+	if update.Size != nil {
+		updates["size"] = *update.Size
+	}
+	if update.ParameterCount != nil {
+		updates["parameter_count"] = *update.ParameterCount
+	}
+
+	if len(updates) == 0 {
+		return nil
+	}
+
+	result := m.db.WithContext(ctx).
+		Table("models").
+		Where("id = ?", modelID).
+		Updates(updates)
+
+	return result.Error
 }

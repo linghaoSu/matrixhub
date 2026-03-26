@@ -16,19 +16,26 @@ package syncjob
 
 import (
 	"context"
+	"time"
 )
 
 type SyncJob struct {
-	ID                 int
-	RemoteRegistryID   int
-	RemoteProjectName  string
-	RemoteResourceName string
-	ProjectName        string
-	ResourceName       string
-	ResourceType       string
-	SyncType           string
-	SyncTaskID         int
-	CompletePercents   int
+	ID                 int       `gorm:"primarykey"`
+	RemoteRegistryID   int       `gorm:"column:remote_registry_id"`
+	RemoteProjectName  string    `gorm:"column:remote_project_name"`
+	RemoteResourceName string    `gorm:"column:remote_resource_name"`
+	ProjectName        string    `gorm:"column:project_name"`
+	ResourceName       string    `gorm:"column:resource_name"`
+	ResourceType       string    `gorm:"column:resource_type"`
+	SyncType           string    `gorm:"column:sync_type"`
+	SyncTaskID         int       `gorm:"column:sync_task_id"`
+	CompletePercents   int       `gorm:"column:complete_percents"`
+	CreatedAt          time.Time `gorm:"column:created_at"`
+	UpdatedAt          time.Time `gorm:"column:updated_at"`
+}
+
+func (SyncJob) TableName() string {
+	return "sync_jobs"
 }
 
 func (p *SyncJob) HasSyncTask() bool {
@@ -37,8 +44,8 @@ func (p *SyncJob) HasSyncTask() bool {
 
 type ISyncJobRepo interface {
 	CreateSyncJob(ctx context.Context, syncJob *SyncJob) error
-	GetSyncJob(ctx context.Context, syncJob *SyncJob) (*SyncJob, error)
+	GetSyncJob(ctx context.Context, id int) (*SyncJob, error)
 	UpdateSyncJob(ctx context.Context, syncJob *SyncJob) error
-	DeleteSyncJob(ctx context.Context, syncJob *SyncJob) error
-	ListSyncJobsByTaskID()
+	DeleteSyncJob(ctx context.Context, id int) error
+	ListSyncJobsByTaskID(ctx context.Context, taskID int) ([]*SyncJob, error)
 }

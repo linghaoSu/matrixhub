@@ -22,8 +22,8 @@ import (
 )
 
 const (
-	DefaultSessionLifetime    = time.Hour * 24
-	DefaultSessionIdleTimeout = 30 * time.Minute
+	DefaultSessionLifetime    = time.Hour * 24 * 7
+	DefaultSessionIdleTimeout = time.Hour * 8
 )
 
 type ISessionRepo interface {
@@ -33,7 +33,10 @@ type ISessionRepo interface {
 	RenewToken(ctx context.Context) error
 	RememberMe(ctx context.Context, val bool)
 	GetString(ctx context.Context, key string) string
+	GetInt(ctx context.Context, key string) int
 	Put(ctx context.Context, key string, val interface{})
 	Destroy(ctx context.Context) error
 	Status(ctx context.Context) scs.Status
+	Exists(ctx context.Context, key string) bool
+	GetBool(ctx context.Context, key string) bool
 }

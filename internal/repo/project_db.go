@@ -22,7 +22,7 @@ import (
 
 	"github.com/matrixhub-ai/matrixhub/internal/domain/project"
 	"github.com/matrixhub-ai/matrixhub/internal/domain/role"
-	"github.com/matrixhub-ai/matrixhub/internal/utils"
+	"github.com/matrixhub-ai/matrixhub/internal/infra/utils"
 )
 
 type ProjectDBRepo struct {

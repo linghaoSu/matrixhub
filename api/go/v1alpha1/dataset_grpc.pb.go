@@ -44,7 +44,7 @@ type DatasetsClient interface {
 	ListDatasetCommits(ctx context.Context, in *ListDatasetCommitsRequest, opts ...grpc.CallOption) (*ListDatasetCommitsResponse, error)
 	GetDatasetCommit(ctx context.Context, in *GetDatasetCommitRequest, opts ...grpc.CallOption) (*Commit, error)
 	GetDatasetTree(ctx context.Context, in *GetDatasetTreeRequest, opts ...grpc.CallOption) (*GetDatasetTreeResponse, error)
-	GetDatasetBlob(ctx context.Context, in *GetDatasetBlobRequest, opts ...grpc.CallOption) (*GetDatasetBlobResponse, error)
+	GetDatasetBlob(ctx context.Context, in *GetDatasetBlobRequest, opts ...grpc.CallOption) (*File, error)
 }
 
 type datasetsClient struct {
@@ -145,9 +145,9 @@ func (c *datasetsClient) GetDatasetTree(ctx context.Context, in *GetDatasetTreeR
 	return out, nil
 }
 
-func (c *datasetsClient) GetDatasetBlob(ctx context.Context, in *GetDatasetBlobRequest, opts ...grpc.CallOption) (*GetDatasetBlobResponse, error) {
+func (c *datasetsClient) GetDatasetBlob(ctx context.Context, in *GetDatasetBlobRequest, opts ...grpc.CallOption) (*File, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetDatasetBlobResponse)
+	out := new(File)
 	err := c.cc.Invoke(ctx, Datasets_GetDatasetBlob_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -168,7 +168,7 @@ type DatasetsServer interface {
 	ListDatasetCommits(context.Context, *ListDatasetCommitsRequest) (*ListDatasetCommitsResponse, error)
 	GetDatasetCommit(context.Context, *GetDatasetCommitRequest) (*Commit, error)
 	GetDatasetTree(context.Context, *GetDatasetTreeRequest) (*GetDatasetTreeResponse, error)
-	GetDatasetBlob(context.Context, *GetDatasetBlobRequest) (*GetDatasetBlobResponse, error)
+	GetDatasetBlob(context.Context, *GetDatasetBlobRequest) (*File, error)
 }
 
 // UnimplementedDatasetsServer should be embedded to have
@@ -205,7 +205,7 @@ func (UnimplementedDatasetsServer) GetDatasetCommit(context.Context, *GetDataset
 func (UnimplementedDatasetsServer) GetDatasetTree(context.Context, *GetDatasetTreeRequest) (*GetDatasetTreeResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetDatasetTree not implemented")
 }
-func (UnimplementedDatasetsServer) GetDatasetBlob(context.Context, *GetDatasetBlobRequest) (*GetDatasetBlobResponse, error) {
+func (UnimplementedDatasetsServer) GetDatasetBlob(context.Context, *GetDatasetBlobRequest) (*File, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetDatasetBlob not implemented")
 }
 func (UnimplementedDatasetsServer) testEmbeddedByValue() {}

@@ -72,8 +72,11 @@ func (FileType) EnumDescriptor() ([]byte, []int) {
 type Category int32
 
 const (
-	Category_TASK    Category = 0
-	Category_LIBRARY Category = 1
+	Category_TASK     Category = 0
+	Category_LIBRARY  Category = 1
+	Category_LICENSE  Category = 2
+	Category_LANGUAGE Category = 3
+	Category_OTHER    Category = 4
 )
 
 // Enum value maps for Category.
@@ -81,10 +84,16 @@ var (
 	Category_name = map[int32]string{
 		0: "TASK",
 		1: "LIBRARY",
+		2: "LICENSE",
+		3: "LANGUAGE",
+		4: "OTHER",
 	}
 	Category_value = map[string]int32{
-		"TASK":    0,
-		"LIBRARY": 1,
+		"TASK":     0,
+		"LIBRARY":  1,
+		"LICENSE":  2,
+		"LANGUAGE": 3,
+		"OTHER":    4,
 	}
 )
 
@@ -1061,7 +1070,7 @@ func (x *GetModelTreeRequest) GetPath() string {
 	return ""
 }
 
-type Files struct {
+type File struct {
 	state  protoimpl.MessageState `protogen:"open.v1"`
 	Name   string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	Type   FileType               `protobuf:"varint,2,opt,name=type,proto3,enum=matrixhub.v1alpha1.FileType" json:"type,omitempty"`
@@ -1072,24 +1081,25 @@ type Files struct {
 	// commit with out diffs
 	// only file type have commit
 	Commit        *Commit `protobuf:"bytes,7,opt,name=commit,proto3" json:"commit,omitempty"`
+	Url           string  `protobuf:"bytes,8,opt,name=url,proto3" json:"url,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *Files) Reset() {
-	*x = Files{}
+func (x *File) Reset() {
+	*x = File{}
 	mi := &file_v1alpha1_model_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *Files) String() string {
+func (x *File) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Files) ProtoMessage() {}
+func (*File) ProtoMessage() {}
 
-func (x *Files) ProtoReflect() protoreflect.Message {
+func (x *File) ProtoReflect() protoreflect.Message {
 	mi := &file_v1alpha1_model_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1101,63 +1111,70 @@ func (x *Files) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Files.ProtoReflect.Descriptor instead.
-func (*Files) Descriptor() ([]byte, []int) {
+// Deprecated: Use File.ProtoReflect.Descriptor instead.
+func (*File) Descriptor() ([]byte, []int) {
 	return file_v1alpha1_model_proto_rawDescGZIP(), []int{18}
 }
 
-func (x *Files) GetName() string {
+func (x *File) GetName() string {
 	if x != nil {
 		return x.Name
 	}
 	return ""
 }
 
-func (x *Files) GetType() FileType {
+func (x *File) GetType() FileType {
 	if x != nil {
 		return x.Type
 	}
 	return FileType_DIR
 }
 
-func (x *Files) GetPath() string {
+func (x *File) GetPath() string {
 	if x != nil {
 		return x.Path
 	}
 	return ""
 }
 
-func (x *Files) GetSize() int64 {
+func (x *File) GetSize() int64 {
 	if x != nil {
 		return x.Size
 	}
 	return 0
 }
 
-func (x *Files) GetLfs() bool {
+func (x *File) GetLfs() bool {
 	if x != nil {
 		return x.Lfs
 	}
 	return false
 }
 
-func (x *Files) GetSha256() string {
+func (x *File) GetSha256() string {
 	if x != nil {
 		return x.Sha256
 	}
 	return ""
 }
 
-func (x *Files) GetCommit() *Commit {
+func (x *File) GetCommit() *Commit {
 	if x != nil {
 		return x.Commit
 	}
 	return nil
 }
 
+func (x *File) GetUrl() string {
+	if x != nil {
+		return x.Url
+	}
+	return ""
+}
+
 type GetModelTreeResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Items         []*Files               `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"`
+	Items         []*File                `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1192,7 +1209,7 @@ func (*GetModelTreeResponse) Descriptor() ([]byte, []int) {
 	return file_v1alpha1_model_proto_rawDescGZIP(), []int{19}
 }
 
-func (x *GetModelTreeResponse) GetItems() []*Files {
+func (x *GetModelTreeResponse) GetItems() []*File {
 	if x != nil {
 		return x.Items
 	}
@@ -1267,66 +1284,6 @@ func (x *GetModelBlobRequest) GetPath() string {
 	return ""
 }
 
-type GetModelBlobResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Lfs           bool                   `protobuf:"varint,1,opt,name=lfs,proto3" json:"lfs,omitempty"`
-	Content       string                 `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"`
-	Url           string                 `protobuf:"bytes,3,opt,name=url,proto3" json:"url,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetModelBlobResponse) Reset() {
-	*x = GetModelBlobResponse{}
-	mi := &file_v1alpha1_model_proto_msgTypes[21]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetModelBlobResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetModelBlobResponse) ProtoMessage() {}
-
-func (x *GetModelBlobResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_v1alpha1_model_proto_msgTypes[21]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetModelBlobResponse.ProtoReflect.Descriptor instead.
-func (*GetModelBlobResponse) Descriptor() ([]byte, []int) {
-	return file_v1alpha1_model_proto_rawDescGZIP(), []int{21}
-}
-
-func (x *GetModelBlobResponse) GetLfs() bool {
-	if x != nil {
-		return x.Lfs
-	}
-	return false
-}
-
-func (x *GetModelBlobResponse) GetContent() string {
-	if x != nil {
-		return x.Content
-	}
-	return ""
-}
-
-func (x *GetModelBlobResponse) GetUrl() string {
-	if x != nil {
-		return x.Url
-	}
-	return ""
-}
-
 type Model struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
 	Id             int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -1347,7 +1304,7 @@ type Model struct {
 
 func (x *Model) Reset() {
 	*x = Model{}
-	mi := &file_v1alpha1_model_proto_msgTypes[22]
+	mi := &file_v1alpha1_model_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1359,7 +1316,7 @@ func (x *Model) String() string {
 func (*Model) ProtoMessage() {}
 
 func (x *Model) ProtoReflect() protoreflect.Message {
-	mi := &file_v1alpha1_model_proto_msgTypes[22]
+	mi := &file_v1alpha1_model_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1372,7 +1329,7 @@ func (x *Model) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Model.ProtoReflect.Descriptor instead.
 func (*Model) Descriptor() ([]byte, []int) {
-	return file_v1alpha1_model_proto_rawDescGZIP(), []int{22}
+	return file_v1alpha1_model_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *Model) GetId() int32 {
@@ -1469,7 +1426,7 @@ type CloneUrls struct {
 
 func (x *CloneUrls) Reset() {
 	*x = CloneUrls{}
-	mi := &file_v1alpha1_model_proto_msgTypes[23]
+	mi := &file_v1alpha1_model_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1481,7 +1438,7 @@ func (x *CloneUrls) String() string {
 func (*CloneUrls) ProtoMessage() {}
 
 func (x *CloneUrls) ProtoReflect() protoreflect.Message {
-	mi := &file_v1alpha1_model_proto_msgTypes[23]
+	mi := &file_v1alpha1_model_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1494,7 +1451,7 @@ func (x *CloneUrls) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CloneUrls.ProtoReflect.Descriptor instead.
 func (*CloneUrls) Descriptor() ([]byte, []int) {
-	return file_v1alpha1_model_proto_rawDescGZIP(), []int{23}
+	return file_v1alpha1_model_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *CloneUrls) GetSshUrl() string {
@@ -1520,7 +1477,7 @@ type Revision struct {
 
 func (x *Revision) Reset() {
 	*x = Revision{}
-	mi := &file_v1alpha1_model_proto_msgTypes[24]
+	mi := &file_v1alpha1_model_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1532,7 +1489,7 @@ func (x *Revision) String() string {
 func (*Revision) ProtoMessage() {}
 
 func (x *Revision) ProtoReflect() protoreflect.Message {
-	mi := &file_v1alpha1_model_proto_msgTypes[24]
+	mi := &file_v1alpha1_model_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1545,7 +1502,7 @@ func (x *Revision) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Revision.ProtoReflect.Descriptor instead.
 func (*Revision) Descriptor() ([]byte, []int) {
-	return file_v1alpha1_model_proto_rawDescGZIP(), []int{24}
+	return file_v1alpha1_model_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *Revision) GetName() string {
@@ -1564,16 +1521,16 @@ type Commit struct {
 	AuthorDate     string                 `protobuf:"bytes,5,opt,name=author_date,json=authorDate,proto3" json:"author_date,omitempty"`
 	CommitterName  string                 `protobuf:"bytes,6,opt,name=committer_name,json=committerName,proto3" json:"committer_name,omitempty"`
 	CommitterEmail string                 `protobuf:"bytes,7,opt,name=committer_email,json=committerEmail,proto3" json:"committer_email,omitempty"`
-	Diff           string                 `protobuf:"bytes,8,opt,name=diff,proto3" json:"diff,omitempty"`
-	CreatedAt      string                 `protobuf:"bytes,9,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	UpdatedAt      string                 `protobuf:"bytes,10,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	CommitterDate  string                 `protobuf:"bytes,8,opt,name=committer_date,json=committerDate,proto3" json:"committer_date,omitempty"`
+	Diff           string                 `protobuf:"bytes,9,opt,name=diff,proto3" json:"diff,omitempty"`
+	CreatedAt      string                 `protobuf:"bytes,10,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
 
 func (x *Commit) Reset() {
 	*x = Commit{}
-	mi := &file_v1alpha1_model_proto_msgTypes[25]
+	mi := &file_v1alpha1_model_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1585,7 +1542,7 @@ func (x *Commit) String() string {
 func (*Commit) ProtoMessage() {}
 
 func (x *Commit) ProtoReflect() protoreflect.Message {
-	mi := &file_v1alpha1_model_proto_msgTypes[25]
+	mi := &file_v1alpha1_model_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1598,7 +1555,7 @@ func (x *Commit) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Commit.ProtoReflect.Descriptor instead.
 func (*Commit) Descriptor() ([]byte, []int) {
-	return file_v1alpha1_model_proto_rawDescGZIP(), []int{25}
+	return file_v1alpha1_model_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *Commit) GetId() string {
@@ -1650,6 +1607,13 @@ func (x *Commit) GetCommitterEmail() string {
 	return ""
 }
 
+func (x *Commit) GetCommitterDate() string {
+	if x != nil {
+		return x.CommitterDate
+	}
+	return ""
+}
+
 func (x *Commit) GetDiff() string {
 	if x != nil {
 		return x.Diff
@@ -1660,81 +1624,6 @@ func (x *Commit) GetDiff() string {
 func (x *Commit) GetCreatedAt() string {
 	if x != nil {
 		return x.CreatedAt
-	}
-	return ""
-}
-
-func (x *Commit) GetUpdatedAt() string {
-	if x != nil {
-		return x.UpdatedAt
-	}
-	return ""
-}
-
-type Diff struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Diff          string                 `protobuf:"bytes,1,opt,name=diff,proto3" json:"diff,omitempty"`
-	Deleted       bool                   `protobuf:"varint,2,opt,name=Deleted,proto3" json:"Deleted,omitempty"`
-	NewPath       string                 `protobuf:"bytes,3,opt,name=new_path,json=newPath,proto3" json:"new_path,omitempty"`
-	OldPath       string                 `protobuf:"bytes,4,opt,name=old_path,json=oldPath,proto3" json:"old_path,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *Diff) Reset() {
-	*x = Diff{}
-	mi := &file_v1alpha1_model_proto_msgTypes[26]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Diff) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Diff) ProtoMessage() {}
-
-func (x *Diff) ProtoReflect() protoreflect.Message {
-	mi := &file_v1alpha1_model_proto_msgTypes[26]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Diff.ProtoReflect.Descriptor instead.
-func (*Diff) Descriptor() ([]byte, []int) {
-	return file_v1alpha1_model_proto_rawDescGZIP(), []int{26}
-}
-
-func (x *Diff) GetDiff() string {
-	if x != nil {
-		return x.Diff
-	}
-	return ""
-}
-
-func (x *Diff) GetDeleted() bool {
-	if x != nil {
-		return x.Deleted
-	}
-	return false
-}
-
-func (x *Diff) GetNewPath() string {
-	if x != nil {
-		return x.NewPath
-	}
-	return ""
-}
-
-func (x *Diff) GetOldPath() string {
-	if x != nil {
-		return x.OldPath
 	}
 	return ""
 }
@@ -1752,7 +1641,7 @@ type Label struct {
 
 func (x *Label) Reset() {
 	*x = Label{}
-	mi := &file_v1alpha1_model_proto_msgTypes[27]
+	mi := &file_v1alpha1_model_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1764,7 +1653,7 @@ func (x *Label) String() string {
 func (*Label) ProtoMessage() {}
 
 func (x *Label) ProtoReflect() protoreflect.Message {
-	mi := &file_v1alpha1_model_proto_msgTypes[27]
+	mi := &file_v1alpha1_model_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1777,7 +1666,7 @@ func (x *Label) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Label.ProtoReflect.Descriptor instead.
 func (*Label) Descriptor() ([]byte, []int) {
-	return file_v1alpha1_model_proto_rawDescGZIP(), []int{27}
+	return file_v1alpha1_model_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *Label) GetId() int32 {
@@ -1878,26 +1767,23 @@ const file_v1alpha1_model_proto_rawDesc = "" +
 	"\aproject\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\aproject\x12\x1b\n" +
 	"\x04name\x18\x02 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\x04name\x12\x1a\n" +
 	"\brevision\x18\x03 \x01(\tR\brevision\x12\x12\n" +
-	"\x04path\x18\x04 \x01(\tR\x04path\"\xd3\x01\n" +
-	"\x05Files\x12\x12\n" +
+	"\x04path\x18\x04 \x01(\tR\x04path\"\xe4\x01\n" +
+	"\x04File\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x120\n" +
 	"\x04type\x18\x02 \x01(\x0e2\x1c.matrixhub.v1alpha1.FileTypeR\x04type\x12\x12\n" +
 	"\x04path\x18\x03 \x01(\tR\x04path\x12\x12\n" +
 	"\x04size\x18\x04 \x01(\x03R\x04size\x12\x10\n" +
 	"\x03lfs\x18\x05 \x01(\bR\x03lfs\x12\x16\n" +
 	"\x06Sha256\x18\x06 \x01(\tR\x06Sha256\x122\n" +
-	"\x06commit\x18\a \x01(\v2\x1a.matrixhub.v1alpha1.CommitR\x06commit\"G\n" +
-	"\x14GetModelTreeResponse\x12/\n" +
-	"\x05items\x18\x01 \x03(\v2\x19.matrixhub.v1alpha1.FilesR\x05items\"\x85\x01\n" +
+	"\x06commit\x18\a \x01(\v2\x1a.matrixhub.v1alpha1.CommitR\x06commit\x12\x10\n" +
+	"\x03url\x18\b \x01(\tR\x03url\"F\n" +
+	"\x14GetModelTreeResponse\x12.\n" +
+	"\x05items\x18\x01 \x03(\v2\x18.matrixhub.v1alpha1.FileR\x05items\"\x85\x01\n" +
 	"\x13GetModelBlobRequest\x12!\n" +
 	"\aproject\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\aproject\x12\x1b\n" +
 	"\x04name\x18\x02 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\x04name\x12\x1a\n" +
 	"\brevision\x18\x03 \x01(\tR\brevision\x12\x12\n" +
-	"\x04path\x18\x04 \x01(\tR\x04path\"T\n" +
-	"\x14GetModelBlobResponse\x12\x10\n" +
-	"\x03lfs\x18\x01 \x01(\bR\x03lfs\x12\x18\n" +
-	"\acontent\x18\x02 \x01(\tR\acontent\x12\x10\n" +
-	"\x03url\x18\x03 \x01(\tR\x03url\"\x9b\x03\n" +
+	"\x04path\x18\x04 \x01(\tR\x04path\"\x9b\x03\n" +
 	"\x05Model\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1a\n" +
@@ -1919,7 +1805,7 @@ const file_v1alpha1_model_proto_rawDesc = "" +
 	"\assh_url\x18\x01 \x01(\tR\x06sshUrl\x12\x19\n" +
 	"\bhttp_url\x18\x02 \x01(\tR\ahttpUrl\"\x1e\n" +
 	"\bRevision\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\"\xb9\x02\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\"\xc1\x02\n" +
 	"\x06Commit\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12\x1f\n" +
@@ -1929,18 +1815,12 @@ const file_v1alpha1_model_proto_rawDesc = "" +
 	"\vauthor_date\x18\x05 \x01(\tR\n" +
 	"authorDate\x12%\n" +
 	"\x0ecommitter_name\x18\x06 \x01(\tR\rcommitterName\x12'\n" +
-	"\x0fcommitter_email\x18\a \x01(\tR\x0ecommitterEmail\x12\x12\n" +
-	"\x04diff\x18\b \x01(\tR\x04diff\x12\x1d\n" +
+	"\x0fcommitter_email\x18\a \x01(\tR\x0ecommitterEmail\x12%\n" +
+	"\x0ecommitter_date\x18\b \x01(\tR\rcommitterDate\x12\x12\n" +
+	"\x04diff\x18\t \x01(\tR\x04diff\x12\x1d\n" +
 	"\n" +
-	"created_at\x18\t \x01(\tR\tcreatedAt\x12\x1d\n" +
-	"\n" +
-	"updated_at\x18\n" +
-	" \x01(\tR\tupdatedAt\"j\n" +
-	"\x04Diff\x12\x12\n" +
-	"\x04diff\x18\x01 \x01(\tR\x04diff\x12\x18\n" +
-	"\aDeleted\x18\x02 \x01(\bR\aDeleted\x12\x19\n" +
-	"\bnew_path\x18\x03 \x01(\tR\anewPath\x12\x19\n" +
-	"\bold_path\x18\x04 \x01(\tR\aoldPath\"\xa3\x01\n" +
+	"created_at\x18\n" +
+	" \x01(\tR\tcreatedAt\"\xa3\x01\n" +
 	"\x05Label\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x128\n" +
@@ -1951,10 +1831,13 @@ const file_v1alpha1_model_proto_rawDesc = "" +
 	"updated_at\x18\x05 \x01(\tR\tupdatedAt*\x1d\n" +
 	"\bFileType\x12\a\n" +
 	"\x03DIR\x10\x00\x12\b\n" +
-	"\x04FILE\x10\x01*!\n" +
+	"\x04FILE\x10\x01*G\n" +
 	"\bCategory\x12\b\n" +
 	"\x04TASK\x10\x00\x12\v\n" +
-	"\aLIBRARY\x10\x012\xf7\f\n" +
+	"\aLIBRARY\x10\x01\x12\v\n" +
+	"\aLICENSE\x10\x02\x12\f\n" +
+	"\bLANGUAGE\x10\x03\x12\t\n" +
+	"\x05OTHER\x10\x042\xe7\f\n" +
 	"\x06Models\x12\xa0\x01\n" +
 	"\x13ListModelTaskLabels\x12..matrixhub.v1alpha1.ListModelTaskLabelsRequest\x1a/.matrixhub.v1alpha1.ListModelTaskLabelsResponse\"(\x82\xd3\xe4\x93\x02\"\x12 /api/v1alpha1/models/task-labels\x12\xa6\x01\n" +
 	"\x14ListModelFrameLabels\x12/.matrixhub.v1alpha1.ListModelFrameLabelsRequest\x1a0.matrixhub.v1alpha1.ListModelFrameLabelsResponse\"+\x82\xd3\xe4\x93\x02%\x12#/api/v1alpha1/models/library-labels\x12y\n" +
@@ -1966,8 +1849,8 @@ const file_v1alpha1_model_proto_rawDesc = "" +
 	"\x12ListModelRevisions\x12-.matrixhub.v1alpha1.ListModelRevisionsRequest\x1a..matrixhub.v1alpha1.ListModelRevisionsResponse\"7\x82\xd3\xe4\x93\x021\x12//api/v1alpha1/models/{project}/{name}/revisions\x12\xa4\x01\n" +
 	"\x10ListModelCommits\x12+.matrixhub.v1alpha1.ListModelCommitsRequest\x1a,.matrixhub.v1alpha1.ListModelCommitsResponse\"5\x82\xd3\xe4\x93\x02/\x12-/api/v1alpha1/models/{project}/{name}/commits\x12\x93\x01\n" +
 	"\x0eGetModelCommit\x12).matrixhub.v1alpha1.GetModelCommitRequest\x1a\x1a.matrixhub.v1alpha1.Commit\":\x82\xd3\xe4\x93\x024\x122/api/v1alpha1/models/{project}/{name}/commits/{id}\x12\x95\x01\n" +
-	"\fGetModelTree\x12'.matrixhub.v1alpha1.GetModelTreeRequest\x1a(.matrixhub.v1alpha1.GetModelTreeResponse\"2\x82\xd3\xe4\x93\x02,\x12*/api/v1alpha1/models/{project}/{name}/tree\x12\x95\x01\n" +
-	"\fGetModelBlob\x12'.matrixhub.v1alpha1.GetModelBlobRequest\x1a(.matrixhub.v1alpha1.GetModelBlobResponse\"2\x82\xd3\xe4\x93\x02,\x12*/api/v1alpha1/models/{project}/{name}/blobB<Z:github.com/matrixhub-ai/matrixhub/api/go/v1alpha1;v1alpha1b\x06proto3"
+	"\fGetModelTree\x12'.matrixhub.v1alpha1.GetModelTreeRequest\x1a(.matrixhub.v1alpha1.GetModelTreeResponse\"2\x82\xd3\xe4\x93\x02,\x12*/api/v1alpha1/models/{project}/{name}/tree\x12\x85\x01\n" +
+	"\fGetModelBlob\x12'.matrixhub.v1alpha1.GetModelBlobRequest\x1a\x18.matrixhub.v1alpha1.File\"2\x82\xd3\xe4\x93\x02,\x12*/api/v1alpha1/models/{project}/{name}/blobB<Z:github.com/matrixhub-ai/matrixhub/api/go/v1alpha1;v1alpha1b\x06proto3"
 
 var (
 	file_v1alpha1_model_proto_rawDescOnce sync.Once
@@ -1982,7 +1865,7 @@ func file_v1alpha1_model_proto_rawDescGZIP() []byte {
 }
 
 var file_v1alpha1_model_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_v1alpha1_model_proto_msgTypes = make([]protoimpl.MessageInfo, 28)
+var file_v1alpha1_model_proto_msgTypes = make([]protoimpl.MessageInfo, 26)
 var file_v1alpha1_model_proto_goTypes = []any{
 	(FileType)(0),                        // 0: matrixhub.v1alpha1.FileType
 	(Category)(0),                        // 1: matrixhub.v1alpha1.Category
@@ -2004,33 +1887,31 @@ var file_v1alpha1_model_proto_goTypes = []any{
 	(*ListModelCommitsResponse)(nil),     // 17: matrixhub.v1alpha1.ListModelCommitsResponse
 	(*GetModelCommitRequest)(nil),        // 18: matrixhub.v1alpha1.GetModelCommitRequest
 	(*GetModelTreeRequest)(nil),          // 19: matrixhub.v1alpha1.GetModelTreeRequest
-	(*Files)(nil),                        // 20: matrixhub.v1alpha1.Files
+	(*File)(nil),                         // 20: matrixhub.v1alpha1.File
 	(*GetModelTreeResponse)(nil),         // 21: matrixhub.v1alpha1.GetModelTreeResponse
 	(*GetModelBlobRequest)(nil),          // 22: matrixhub.v1alpha1.GetModelBlobRequest
-	(*GetModelBlobResponse)(nil),         // 23: matrixhub.v1alpha1.GetModelBlobResponse
-	(*Model)(nil),                        // 24: matrixhub.v1alpha1.Model
-	(*CloneUrls)(nil),                    // 25: matrixhub.v1alpha1.CloneUrls
-	(*Revision)(nil),                     // 26: matrixhub.v1alpha1.Revision
-	(*Commit)(nil),                       // 27: matrixhub.v1alpha1.Commit
-	(*Diff)(nil),                         // 28: matrixhub.v1alpha1.Diff
-	(*Label)(nil),                        // 29: matrixhub.v1alpha1.Label
-	(*Pagination)(nil),                   // 30: matrixhub.v1alpha1.Pagination
+	(*Model)(nil),                        // 23: matrixhub.v1alpha1.Model
+	(*CloneUrls)(nil),                    // 24: matrixhub.v1alpha1.CloneUrls
+	(*Revision)(nil),                     // 25: matrixhub.v1alpha1.Revision
+	(*Commit)(nil),                       // 26: matrixhub.v1alpha1.Commit
+	(*Label)(nil),                        // 27: matrixhub.v1alpha1.Label
+	(*Pagination)(nil),                   // 28: matrixhub.v1alpha1.Pagination
 }
 var file_v1alpha1_model_proto_depIdxs = []int32{
-	29, // 0: matrixhub.v1alpha1.ListModelTaskLabelsResponse.items:type_name -> matrixhub.v1alpha1.Label
-	29, // 1: matrixhub.v1alpha1.ListModelFrameLabelsResponse.items:type_name -> matrixhub.v1alpha1.Label
-	24, // 2: matrixhub.v1alpha1.ListModelsResponse.items:type_name -> matrixhub.v1alpha1.Model
-	30, // 3: matrixhub.v1alpha1.ListModelsResponse.pagination:type_name -> matrixhub.v1alpha1.Pagination
+	27, // 0: matrixhub.v1alpha1.ListModelTaskLabelsResponse.items:type_name -> matrixhub.v1alpha1.Label
+	27, // 1: matrixhub.v1alpha1.ListModelFrameLabelsResponse.items:type_name -> matrixhub.v1alpha1.Label
+	23, // 2: matrixhub.v1alpha1.ListModelsResponse.items:type_name -> matrixhub.v1alpha1.Model
+	28, // 3: matrixhub.v1alpha1.ListModelsResponse.pagination:type_name -> matrixhub.v1alpha1.Pagination
 	15, // 4: matrixhub.v1alpha1.ListModelRevisionsResponse.items:type_name -> matrixhub.v1alpha1.Revisions
-	26, // 5: matrixhub.v1alpha1.Revisions.branches:type_name -> matrixhub.v1alpha1.Revision
-	26, // 6: matrixhub.v1alpha1.Revisions.tags:type_name -> matrixhub.v1alpha1.Revision
-	27, // 7: matrixhub.v1alpha1.ListModelCommitsResponse.items:type_name -> matrixhub.v1alpha1.Commit
-	30, // 8: matrixhub.v1alpha1.ListModelCommitsResponse.pagination:type_name -> matrixhub.v1alpha1.Pagination
-	0,  // 9: matrixhub.v1alpha1.Files.type:type_name -> matrixhub.v1alpha1.FileType
-	27, // 10: matrixhub.v1alpha1.Files.commit:type_name -> matrixhub.v1alpha1.Commit
-	20, // 11: matrixhub.v1alpha1.GetModelTreeResponse.items:type_name -> matrixhub.v1alpha1.Files
-	25, // 12: matrixhub.v1alpha1.Model.clone_urls:type_name -> matrixhub.v1alpha1.CloneUrls
-	29, // 13: matrixhub.v1alpha1.Model.labels:type_name -> matrixhub.v1alpha1.Label
+	25, // 5: matrixhub.v1alpha1.Revisions.branches:type_name -> matrixhub.v1alpha1.Revision
+	25, // 6: matrixhub.v1alpha1.Revisions.tags:type_name -> matrixhub.v1alpha1.Revision
+	26, // 7: matrixhub.v1alpha1.ListModelCommitsResponse.items:type_name -> matrixhub.v1alpha1.Commit
+	28, // 8: matrixhub.v1alpha1.ListModelCommitsResponse.pagination:type_name -> matrixhub.v1alpha1.Pagination
+	0,  // 9: matrixhub.v1alpha1.File.type:type_name -> matrixhub.v1alpha1.FileType
+	26, // 10: matrixhub.v1alpha1.File.commit:type_name -> matrixhub.v1alpha1.Commit
+	20, // 11: matrixhub.v1alpha1.GetModelTreeResponse.items:type_name -> matrixhub.v1alpha1.File
+	24, // 12: matrixhub.v1alpha1.Model.clone_urls:type_name -> matrixhub.v1alpha1.CloneUrls
+	27, // 13: matrixhub.v1alpha1.Model.labels:type_name -> matrixhub.v1alpha1.Label
 	1,  // 14: matrixhub.v1alpha1.Label.category:type_name -> matrixhub.v1alpha1.Category
 	2,  // 15: matrixhub.v1alpha1.Models.ListModelTaskLabels:input_type -> matrixhub.v1alpha1.ListModelTaskLabelsRequest
 	4,  // 16: matrixhub.v1alpha1.Models.ListModelFrameLabels:input_type -> matrixhub.v1alpha1.ListModelFrameLabelsRequest
@@ -2046,14 +1927,14 @@ var file_v1alpha1_model_proto_depIdxs = []int32{
 	3,  // 26: matrixhub.v1alpha1.Models.ListModelTaskLabels:output_type -> matrixhub.v1alpha1.ListModelTaskLabelsResponse
 	5,  // 27: matrixhub.v1alpha1.Models.ListModelFrameLabels:output_type -> matrixhub.v1alpha1.ListModelFrameLabelsResponse
 	7,  // 28: matrixhub.v1alpha1.Models.ListModels:output_type -> matrixhub.v1alpha1.ListModelsResponse
-	24, // 29: matrixhub.v1alpha1.Models.GetModel:output_type -> matrixhub.v1alpha1.Model
+	23, // 29: matrixhub.v1alpha1.Models.GetModel:output_type -> matrixhub.v1alpha1.Model
 	10, // 30: matrixhub.v1alpha1.Models.CreateModel:output_type -> matrixhub.v1alpha1.CreateModelResponse
 	12, // 31: matrixhub.v1alpha1.Models.DeleteModel:output_type -> matrixhub.v1alpha1.DeleteModelResponse
 	14, // 32: matrixhub.v1alpha1.Models.ListModelRevisions:output_type -> matrixhub.v1alpha1.ListModelRevisionsResponse
 	17, // 33: matrixhub.v1alpha1.Models.ListModelCommits:output_type -> matrixhub.v1alpha1.ListModelCommitsResponse
-	27, // 34: matrixhub.v1alpha1.Models.GetModelCommit:output_type -> matrixhub.v1alpha1.Commit
+	26, // 34: matrixhub.v1alpha1.Models.GetModelCommit:output_type -> matrixhub.v1alpha1.Commit
 	21, // 35: matrixhub.v1alpha1.Models.GetModelTree:output_type -> matrixhub.v1alpha1.GetModelTreeResponse
-	23, // 36: matrixhub.v1alpha1.Models.GetModelBlob:output_type -> matrixhub.v1alpha1.GetModelBlobResponse
+	20, // 36: matrixhub.v1alpha1.Models.GetModelBlob:output_type -> matrixhub.v1alpha1.File
 	26, // [26:37] is the sub-list for method output_type
 	15, // [15:26] is the sub-list for method input_type
 	15, // [15:15] is the sub-list for extension type_name
@@ -2073,7 +1954,7 @@ func file_v1alpha1_model_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_v1alpha1_model_proto_rawDesc), len(file_v1alpha1_model_proto_rawDesc)),
 			NumEnums:      2,
-			NumMessages:   28,
+			NumMessages:   26,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

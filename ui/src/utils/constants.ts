@@ -1,0 +1,3 @@
+export const DEFAULT_PROJECTS_PAGE_SIZE = 10
+
+export const MODEL_COMMITS_PAGE_SIZE = 10

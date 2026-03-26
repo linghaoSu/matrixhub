@@ -21,3 +21,5 @@ data:
     migrationPath: /etc/matrixhub/migrations
     apiServer:
       port: {{ .Values.apiserver.port }}
+    ui:
+      staticDir: /app

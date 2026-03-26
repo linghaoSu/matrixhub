@@ -602,7 +602,7 @@ func (*GetCurrentUserRequest) Descriptor() ([]byte, []int) {
 
 type GetCurrentUserResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id            uint32                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	Username      string                 `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
 	IsAdmin       bool                   `protobuf:"varint,3,opt,name=is_admin,json=isAdmin,proto3" json:"is_admin,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -639,11 +639,11 @@ func (*GetCurrentUserResponse) Descriptor() ([]byte, []int) {
 	return file_v1alpha1_current_user_proto_rawDescGZIP(), []int{12}
 }
 
-func (x *GetCurrentUserResponse) GetId() string {
+func (x *GetCurrentUserResponse) GetId() uint32 {
 	if x != nil {
 		return x.Id
 	}
-	return ""
+	return 0
 }
 
 func (x *GetCurrentUserResponse) GetUsername() string {
@@ -696,7 +696,7 @@ const file_v1alpha1_current_user_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\x0e2#.matrixhub.v1alpha1.ProjectRoleTypeR\x05value:\x028\x01\"\x17\n" +
 	"\x15GetCurrentUserRequest\"_\n" +
 	"\x16GetCurrentUserResponse\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
+	"\x02id\x18\x01 \x01(\rR\x02id\x12\x1a\n" +
 	"\busername\x18\x02 \x01(\tR\busername\x12\x19\n" +
 	"\bis_admin\x18\x03 \x01(\bR\aisAdmin*t\n" +
 	"\x11AccessTokenStatus\x12\x1f\n" +

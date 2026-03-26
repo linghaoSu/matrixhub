@@ -16,18 +16,39 @@ package syncpolicy
 
 import (
 	"context"
+	"time"
+)
+
+// SyncTaskStatus represents the status of a sync task
+const (
+	SyncTaskStatusRunning int = iota + 1
+	SyncTaskStatusSucceeded
+	SyncTaskStatusFailed
+	SyncTaskStatusStopped
 )
 
 type SyncTask struct {
-	ID               int
-	SyncPolicyID     int
-	CompletePercents int
+	ID                 int       `gorm:"primarykey"`
+	SyncPolicyID       int       `gorm:"column:sync_policy_id"`
+	TriggerType        int       `gorm:"column:trigger_type"` // 1: manual, 2: scheduled
+	Status             int       `gorm:"column:status"`       // 1: running, 2: succeeded, 3: failed, 4: stopped
+	StartedTimestamp   int64     `gorm:"column:started_timestamp"`
+	CompletedTimestamp int64     `gorm:"column:completed_timestamp"`
+	TotalItems         int       `gorm:"column:total_items"`
+	SuccessfulItems    int       `gorm:"column:successful_items"`
+	CompletePercents   int       `gorm:"column:complete_percents"`
+	CreatedAt          time.Time `gorm:"column:created_at"`
+	UpdatedAt          time.Time `gorm:"column:updated_at"`
+}
+
+func (SyncTask) TableName() string {
+	return "sync_tasks"
 }
 
 type ISyncTaskRepo interface {
 	CreateSyncTask(ctx context.Context, task *SyncTask) (*SyncTask, error)
-	GetSyncTask(ctx context.Context, task *SyncTask) (*SyncTask, error)
+	GetSyncTask(ctx context.Context, id int) (*SyncTask, error)
 	UpdateSyncTask(ctx context.Context, task *SyncTask) error
-	DeleteSyncTask(ctx context.Context, task *SyncTask) error
-	ListSyncTasksByPolicyID()
+	DeleteSyncTask(ctx context.Context, id int) error
+	ListSyncTasksByPolicyID(ctx context.Context, policyID int, page, pageSize int, search string) ([]*SyncTask, int64, error)
 }

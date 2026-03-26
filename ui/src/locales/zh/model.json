@@ -1,9 +1,65 @@
 {
+  "new": "创建模型",
+  "project": "项目",
+  "library": "框架",
+  "task": "任务",
   "detail": {
     "desc": "模型介绍",
     "tree": "模型文件",
-    "setting": "模型设置"
+    "setting": "模型设置",
+    "history": "{{count}} 条提交"
+  },
+  "commits": {
+    "loadFailed": "提交记录加载失败，请稍后重试。"
+  },
+  "commitDetail": {
+    "title": "提交详情"
   },
   "upload": "上传模型文件",
-  "download": "下载模型文件"
+  "download": "下载模型文件",
+  "placeholder": {
+    "task": "输入任务名称搜索",
+    "library": "输入框架名称搜索",
+    "project": "输入项目名称搜索"
+  },
+  "recommend": "推荐模型",
+  "allModels": "全部模型",
+  "viewMore": "查看更多",
+  "revisionPathHeader": {
+    "group": {
+      "branch": "分支",
+      "tag": "标签"
+    }
+  },
+  "settings": {
+    "delete": {
+      "title": "删除模型",
+      "warning": "此操作无法撤销。这将永久删除 {{name}} 模型库及其所有文件，包括权重。",
+      "confirmation": "请输入 {{name}}",
+      "action": "删除模型",
+      "success": "模型删除成功",
+      "error": "模型删除失败"
+    },
+    "recommended": {
+      "title": "热门模型",
+      "label": "设为热门模型",
+      "confirmation": "确定要设置模型 {{name}} 为热门模型吗？",
+      "unsetConfirmation": "确定要取消 {{name}} 的热门模型状态吗？"
+    }
+  },
+  "create": {
+    "modelName": "模型名称",
+    "modelNamePlaceholder": "请输入模型名称",
+    "modelNameHelper": "支持数字、字母、下划线、短横线和点，且只能以数字、字母开头",
+    "project": "所属项目",
+    "projectPlaceholder": "请选择项目",
+    "projectTooltip": "私有项目中的所有模型/数据集均为私有，公开项目中的所有模型/数据集均为公开。",
+    "submit": "创建模型",
+    "uploadTip": "模型创建完成后，您可以使用命令行上传文件。",
+    "modelNameRequired": "请输入模型名称",
+    "modelNameInvalid": "模型名称格式不正确",
+    "projectRequired": "请选择所属项目",
+    "success": "模型创建成功",
+    "error": "创建模型失败"
+  }
 }

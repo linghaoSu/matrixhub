@@ -1,18 +1,16 @@
+import { ProjectRoleType } from '@matrixhub/api-ts/v1alpha1/role.pb'
 import { createFileRoute } from '@tanstack/react-router'
+
+import { ProjectSettingsPage } from '@/features/projects/pages/ProjectSettingsPage'
+import { ensureProjectAccess } from '@/utils/routerAccess'
 
 export const Route = createFileRoute(
   '/(auth)/(app)/projects/$projectId/settings/',
 )({
-  component: RouteComponent,
+  beforeLoad: async ({ params }) => {
+    await ensureProjectAccess(params.projectId, {
+      allowedRoles: [ProjectRoleType.ROLE_TYPE_PROJECT_ADMIN],
+    })
+  },
+  component: ProjectSettingsPage,
 })
-
-function RouteComponent() {
-  const { projectId } = Route.useParams()
-
-  return (
-    <div>
-      Project Settings Page - Project ID:
-      {projectId}
-    </div>
-  )
-}

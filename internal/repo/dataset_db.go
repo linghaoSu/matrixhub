@@ -16,6 +16,7 @@ package repo
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"gorm.io/gorm"
@@ -142,6 +143,31 @@ func (d *datasetDB) List(ctx context.Context, filter *model.Filter) ([]*dataset.
 
 // Create creates a new dataset
 func (d *datasetDB) Create(ctx context.Context, ds *dataset.Dataset) (*dataset.Dataset, error) {
+	// Get project ID from project name
+	if ds.ProjectName == "" {
+		return nil, fmt.Errorf("project name is required")
+	}
+
+	var result struct {
+		ID int `db:"id"`
+	}
+	err := d.db.WithContext(ctx).
+		Table("projects").
+		Select("id").
+		Where("name = ?", ds.ProjectName).
+		First(&result).Error
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, fmt.Errorf("project not found: %s", ds.ProjectName)
+		}
+		return nil, fmt.Errorf("failed to get project: %w", err)
+	}
+
+	// Set project ID and create dataset
+	ds.ProjectID = result.ID
+	ds.DefaultBranch = "main" // Set default branch
+
 	if err := d.db.WithContext(ctx).Create(ds).Error; err != nil {
 		return nil, fmt.Errorf("failed to create dataset: %w", err)
 	}

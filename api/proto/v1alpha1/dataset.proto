@@ -56,7 +56,7 @@ service Datasets {
       get: "/api/v1alpha1/datasets/{project}/{name}/tree"
     };
   }
-  rpc GetDatasetBlob(GetDatasetBlobRequest) returns (GetDatasetBlobResponse) {
+  rpc GetDatasetBlob(GetDatasetBlobRequest) returns (File) {
     option (google.api.http) = {
       get: "/api/v1alpha1/datasets/{project}/{name}/blob"
     };
@@ -143,7 +143,7 @@ message GetDatasetTreeRequest {
 }
 
 message GetDatasetTreeResponse {
-  repeated Files items = 1;
+  repeated File items = 1;
 }
 
 message GetDatasetBlobRequest {
@@ -151,12 +151,6 @@ message GetDatasetBlobRequest {
   string name = 2 [(validate.rules).string.min_len = 1];
   string revision = 3;
   string path = 4;
-}
-
-message GetDatasetBlobResponse {
-  bool lfs = 1;
-  string content = 2;
-  string url = 3;
 }
 
 message Dataset {

@@ -60,7 +60,7 @@ service Models {
       get: "/api/v1alpha1/models/{project}/{name}/tree"
     };
   }
-  rpc GetModelBlob(GetModelBlobRequest) returns (GetModelBlobResponse) {
+  rpc GetModelBlob(GetModelBlobRequest) returns (File) {
     option (google.api.http) = {
       get: "/api/v1alpha1/models/{project}/{name}/blob"
     };
@@ -160,7 +160,7 @@ message GetModelTreeRequest {
   string path = 4;
 }
 
-message Files {
+message File {
   string name = 1;
   FileType type = 2;
   string path = 3;
@@ -170,10 +170,11 @@ message Files {
   // commit with out diffs
   // only file type have commit
   Commit commit = 7;
+  string url = 8;
 }
 
 message GetModelTreeResponse {
-  repeated Files items = 1;
+  repeated File items = 1;
 }
 
 message GetModelBlobRequest {
@@ -181,12 +182,6 @@ message GetModelBlobRequest {
   string name = 2 [(validate.rules).string.min_len = 1];
   string revision = 3;
   string path = 4;
-}
-
-message GetModelBlobResponse {
-  bool lfs = 1;
-  string content = 2;
-  string url = 3;
 }
 
 message Model {
@@ -217,6 +212,9 @@ enum FileType {
 enum Category {
   TASK = 0;
   LIBRARY = 1;
+  LICENSE = 2;
+  LANGUAGE = 3;
+  OTHER = 4;
 }
 
 message Revision {
@@ -231,16 +229,9 @@ message Commit {
   string author_date = 5;
   string committer_name = 6;
   string committer_email = 7;
-  string diff = 8;
-  string created_at = 9;
-  string updated_at = 10;
-}
-
-message Diff {
-  string diff = 1;
-  bool Deleted = 2;
-  string new_path = 3;
-  string old_path = 4;
+  string committer_date = 8;
+  string diff = 9;
+  string created_at = 10;
 }
 
 message Label {
@@ -249,5 +240,4 @@ message Label {
   Category category = 3;
   string created_at = 4;
   string updated_at = 5;
-
 }

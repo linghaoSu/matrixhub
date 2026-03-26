@@ -234,9 +234,10 @@ type PullBasePolicy struct {
 	ResourceTypes      []ResourceType         `protobuf:"varint,3,rep,packed,name=resource_types,json=resourceTypes,proto3,enum=matrixhub.v1alpha1.ResourceType" json:"resource_types,omitempty"`
 	TargetResourceName string                 `protobuf:"bytes,4,opt,name=target_resource_name,json=targetResourceName,proto3" json:"target_resource_name,omitempty"`
 	// post or put do not require this field.
-	SourceRegistry *Registry `protobuf:"bytes,5,opt,name=source_registry,json=sourceRegistry,proto3" json:"source_registry,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	SourceRegistry    *Registry `protobuf:"bytes,5,opt,name=source_registry,json=sourceRegistry,proto3" json:"source_registry,omitempty"`
+	TargetProjectName string    `protobuf:"bytes,6,opt,name=target_project_name,json=targetProjectName,proto3" json:"target_project_name,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *PullBasePolicy) Reset() {
@@ -304,6 +305,13 @@ func (x *PullBasePolicy) GetSourceRegistry() *Registry {
 	return nil
 }
 
+func (x *PullBasePolicy) GetTargetProjectName() string {
+	if x != nil {
+		return x.TargetProjectName
+	}
+	return ""
+}
+
 type PushBasePolicy struct {
 	state              protoimpl.MessageState `protogen:"open.v1"`
 	ResourceName       string                 `protobuf:"bytes,1,opt,name=resource_name,json=resourceName,proto3" json:"resource_name,omitempty"`
@@ -311,9 +319,10 @@ type PushBasePolicy struct {
 	TargetRegistryId   uint32                 `protobuf:"varint,3,opt,name=target_registry_id,json=targetRegistryId,proto3" json:"target_registry_id,omitempty"`
 	TargetResourceName string                 `protobuf:"bytes,4,opt,name=target_resource_name,json=targetResourceName,proto3" json:"target_resource_name,omitempty"`
 	// post or put do not require this field.
-	TargetRegistry *Registry `protobuf:"bytes,5,opt,name=target_registry,json=targetRegistry,proto3" json:"target_registry,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	TargetRegistry    *Registry `protobuf:"bytes,5,opt,name=target_registry,json=targetRegistry,proto3" json:"target_registry,omitempty"`
+	TargetProjectName string    `protobuf:"bytes,6,opt,name=target_project_name,json=targetProjectName,proto3" json:"target_project_name,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *PushBasePolicy) Reset() {
@@ -379,6 +388,13 @@ func (x *PushBasePolicy) GetTargetRegistry() *Registry {
 		return x.TargetRegistry
 	}
 	return nil
+}
+
+func (x *PushBasePolicy) GetTargetProjectName() string {
+	if x != nil {
+		return x.TargetProjectName
+	}
+	return ""
 }
 
 type SyncPolicyItem struct {
@@ -1588,19 +1604,21 @@ var File_v1alpha1_sync_policy_proto protoreflect.FileDescriptor
 
 const file_v1alpha1_sync_policy_proto_rawDesc = "" +
 	"\n" +
-	"\x1av1alpha1/sync_policy.proto\x12\x12matrixhub.v1alpha1\x1a\x1cgoogle/api/annotations.proto\x1a\x14v1alpha1/utils.proto\x1a\x17v1alpha1/registry.proto\"\xa5\x02\n" +
+	"\x1av1alpha1/sync_policy.proto\x12\x12matrixhub.v1alpha1\x1a\x1cgoogle/api/annotations.proto\x1a\x14v1alpha1/utils.proto\x1a\x17v1alpha1/registry.proto\"\xd5\x02\n" +
 	"\x0ePullBasePolicy\x12,\n" +
 	"\x12source_registry_id\x18\x01 \x01(\rR\x10sourceRegistryId\x12#\n" +
 	"\rresource_name\x18\x02 \x01(\tR\fresourceName\x12G\n" +
 	"\x0eresource_types\x18\x03 \x03(\x0e2 .matrixhub.v1alpha1.ResourceTypeR\rresourceTypes\x120\n" +
 	"\x14target_resource_name\x18\x04 \x01(\tR\x12targetResourceName\x12E\n" +
-	"\x0fsource_registry\x18\x05 \x01(\v2\x1c.matrixhub.v1alpha1.RegistryR\x0esourceRegistry\"\xa5\x02\n" +
+	"\x0fsource_registry\x18\x05 \x01(\v2\x1c.matrixhub.v1alpha1.RegistryR\x0esourceRegistry\x12.\n" +
+	"\x13target_project_name\x18\x06 \x01(\tR\x11targetProjectName\"\xd5\x02\n" +
 	"\x0ePushBasePolicy\x12#\n" +
 	"\rresource_name\x18\x01 \x01(\tR\fresourceName\x12G\n" +
 	"\x0eresource_types\x18\x02 \x03(\x0e2 .matrixhub.v1alpha1.ResourceTypeR\rresourceTypes\x12,\n" +
 	"\x12target_registry_id\x18\x03 \x01(\rR\x10targetRegistryId\x120\n" +
 	"\x14target_resource_name\x18\x04 \x01(\tR\x12targetResourceName\x12E\n" +
-	"\x0ftarget_registry\x18\x05 \x01(\v2\x1c.matrixhub.v1alpha1.RegistryR\x0etargetRegistry\"\xeb\x03\n" +
+	"\x0ftarget_registry\x18\x05 \x01(\v2\x1c.matrixhub.v1alpha1.RegistryR\x0etargetRegistry\x12.\n" +
+	"\x13target_project_name\x18\x06 \x01(\tR\x11targetProjectName\"\xeb\x03\n" +
 	"\x0eSyncPolicyItem\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +

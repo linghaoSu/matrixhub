@@ -26,10 +26,9 @@ type Dataset struct {
 	ID            int64         `json:"id" db:"id"`
 	Name          string        `json:"name" db:"name"`
 	ProjectID     int           `json:"projectId" db:"project_id"`
-	ProjectName   string        `json:"projectName" db:"project_name"`
+	ProjectName   string        `json:"projectName" db:"project_name" gorm:"<-:false"`
 	DefaultBranch string        `json:"defaultBranch" db:"default_branch"`
 	NumRows       string        `json:"numRows" db:"num_rows"`
-	License       string        `json:"license" db:"license"`
 	Size          int64         `json:"size" db:"size"`
 	ReadmeContent string        `json:"readmeContent" db:"readme_content"`
 	IsPopular     bool          `json:"isPopular" db:"is_popular"`

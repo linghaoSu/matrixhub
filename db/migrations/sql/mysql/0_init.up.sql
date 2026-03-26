@@ -150,19 +150,46 @@ CREATE TABLE IF NOT EXISTS `access_tokens`
 
 CREATE TABLE IF NOT EXISTS `sync_policies`
 (
-    `id`         int       NOT NULL AUTO_INCREMENT,
-    `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`)
+    `id`                  int       NOT NULL AUTO_INCREMENT,
+    `name`                varchar(255) NOT NULL,
+    `description`         text,
+    `policy_type`         int       NOT NULL DEFAULT 1, -- 1: pull, 2: push
+    `trigger_type`        int       NOT NULL DEFAULT 1, -- 1: manual, 2: scheduled
+    `source_registry_id`  int,
+    `resource_name`       varchar(255),
+    `resource_types`      varchar(255),                 -- comma separated: model,dataset
+    `target_resource_name` varchar(255),
+    `target_project_name`  varchar(255),
+    `bandwidth`           varchar(64),
+    `is_overwrite`        tinyint(1) NOT NULL DEFAULT 0,
+    `is_disabled`         tinyint(1) NOT NULL DEFAULT 0,
+    `created_at`          timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at`          timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    KEY `idx_name` (`name`),
+    KEY `idx_source_registry_id` (`source_registry_id`),
+    CONSTRAINT `fk_sync_policies_registry_id`
+        FOREIGN KEY (`source_registry_id`) REFERENCES `registries` (`id`) ON DELETE SET NULL
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `sync_tasks`
 (
     `id`                  int       NOT NULL AUTO_INCREMENT,
-    `sync_policy_id` int,
+    `sync_policy_id`      int       NOT NULL,
+    `trigger_type`        int       NOT NULL DEFAULT 1, -- 1: manual, 2: scheduled
+    `status`              int       NOT NULL DEFAULT 1, -- 1: running, 2: succeeded, 3: failed, 4: stopped
+    `started_timestamp`   bigint    DEFAULT 0,
+    `completed_timestamp` bigint    DEFAULT 0,
+    `total_items`         int       DEFAULT 0,
+    `successful_items`    int       DEFAULT 0,
+    `complete_percents`   int       DEFAULT 0,
     `created_at`          timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at`          timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`),
+    KEY `idx_sync_policy_id` (`sync_policy_id`),
+    KEY `idx_status` (`status`),
+    CONSTRAINT `fk_sync_tasks_policy_id`
+        FOREIGN KEY (`sync_policy_id`) REFERENCES `sync_policies` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `sync_jobs`

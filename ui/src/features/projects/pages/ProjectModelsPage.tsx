@@ -6,30 +6,20 @@ import {
   Stack,
   Text,
 } from '@mantine/core'
-import { Category } from '@matrixhub/api-ts/v1alpha1/model.pb'
 import {
-  getRouteApi,
-  Link,
-} from '@tanstack/react-router'
+  IconClock,
+  IconCube,
+} from '@tabler/icons-react'
+import { getRouteApi, Link } from '@tanstack/react-router'
 import { startTransition } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import BinaryTreeIcon from '@/assets/svgs/binary-tree.svg?react'
-import ClockIcon from '@/assets/svgs/clock.svg?react'
-import ModelIcon from '@/assets/svgs/model.svg?react'
-import PhotoUpIcon from '@/assets/svgs/photo-up.svg?react'
-import PytorchIcon from '@/assets/svgs/pytorch.svg?react'
 import {
   PAGE_SIZE,
   useModels,
 } from '@/features/models/models.query'
-import {
-  buildModelBadges,
-  buildModelMetaItems,
-  buildModelTitle,
-} from '@/features/models/models.utils'
 import { Pagination } from '@/shared/components/Pagination'
-import { ResourceCard } from '@/shared/components/ResourceCard'
+import { ModelCard } from '@/shared/components/resource-card/ModelCard.tsx'
 import { ResourceCardGrid } from '@/shared/components/ResourceCardGrid'
 import { SearchToolbar } from '@/shared/components/SearchToolbar'
 import { SortDropdown } from '@/shared/components/SortDropdown'
@@ -79,51 +69,18 @@ export function ProjectModelsPage() {
     {
       value: 'updatedAt',
       label: t('projects.detail.modelsPage.sortFieldUpdatedAt'),
-      icon: <ClockIcon width={16} height={16} />,
+      icon: <IconClock size={16} />,
     },
   ]
 
   const cardElements = models.map((model) => {
-    const modelName = model.name?.trim()
+    const modelName = model.name?.trim() ?? '-'
 
     return (
-      <ResourceCard
-        key={`${model.project ?? projectId}/${model.name ?? '-'}`}
-        title={buildModelTitle(model, projectId)}
-        renderRoot={modelName
-          ? (props: Record<string, unknown>) => (
-              <Link
-                {...props}
-                to="/projects/$projectId/models/$modelId"
-                params={{
-                  projectId,
-                  modelId: modelName,
-                }}
-              />
-            )
-          : undefined}
-        badges={buildModelBadges(model, {
-          taskCategory: Category.TASK,
-          libraryCategory: Category.LIBRARY,
-          taskIcon: (
-            <PhotoUpIcon
-              width={16}
-              height={16}
-              style={{ color: 'var(--mantine-color-blue-4)' }}
-            />
-          ),
-          libraryIconFn: name => /pytorch/i.test(name)
-            ? <PytorchIcon width={16} height={16} />
-            : undefined,
-          parameterCountIcon: (
-            <BinaryTreeIcon
-              width={16}
-              height={16}
-              style={{ color: 'var(--mantine-color-violet-4)' }}
-            />
-          ),
-        })}
-        metaItems={buildModelMetaItems(model, projectId)}
+      <ModelCard
+        key={`${model.project?.trim() ?? projectId}/${modelName}`}
+        model={model}
+        fallbackProjectId={projectId}
       />
     )
   })
@@ -181,16 +138,16 @@ export function ProjectModelsPage() {
             }}
           />
 
-          <Button
-            h={32}
-            px="md"
-            radius={6}
-            leftSection={<ModelIcon width={16} height={16} />}
-            component={Link}
-            to="/models/new"
-          >
-            {t('projects.detail.modelsPage.create')}
-          </Button>
+          <Link to="/models/new" search={{ projectId }}>
+            <Button
+              h={32}
+              px="md"
+              radius={6}
+              leftSection={<IconCube size={16} />}
+            >
+              {t('projects.detail.modelsPage.create')}
+            </Button>
+          </Link>
         </SearchToolbar>
 
         <Space h="lg"></Space>

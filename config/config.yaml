@@ -16,3 +16,6 @@ database:
 
 apiServer:
   port: 3001
+
+ui:
+  staticDir: /app

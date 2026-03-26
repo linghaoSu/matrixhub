@@ -1,9 +1,65 @@
 {
   "upload": "Upload Model Files",
   "download": "Download Model",
+  "new": "Create New Model",
+  "project": "Project",
+  "library": "Library",
+  "task": "Task",
+  "placeholder": {
+    "task": "Search by task name",
+    "library": "Search by library name",
+    "project": "Search by project name"
+  },
+  "recommend": "Recommended Models",
+  "allModels": "All Models",
+  "viewMore": "View More",
+  "revisionPathHeader": {
+    "group": {
+      "branch": "Branch",
+      "tag": "Tag"
+    }
+  },
   "detail": {
     "desc": "Model Introduction",
     "tree": "Model Files",
-    "setting": "Settings"
+    "setting": "Settings",
+    "history": "Commit History"
+  },
+  "commits": {
+    "loadFailed": "Failed to load commit history. Please try again later."
+  },
+  "commitDetail": {
+    "title": "Commit Detail"
+  },
+  "settings": {
+    "delete": {
+      "title": "Delete Model",
+      "warning": "This action cannot be undone. This will permanently delete the {{name}} model repository and all of its files, including weights.",
+      "confirmation": "Please enter {{name}}",
+      "action": "Delete Model",
+      "success": "Model deleted successfully",
+      "error": "Model deletion failed"
+    },
+    "recommended": {
+      "title": "Featured Model",
+      "label": "Mark as featured model",
+      "confirmation": "Are you sure you want to mark model {{name}} as a featured model?",
+      "unsetConfirmation": "Are you sure you want to remove {{name}} from featured models?"
+    }
+  },
+  "create": {
+    "modelName": "Model Name",
+    "modelNamePlaceholder": "Enter model name",
+    "modelNameHelper": "Supports letters, numbers, underscore, hyphen, and dot. Must start with a letter or number.",
+    "project": "Project",
+    "projectPlaceholder": "Select a project",
+    "projectTooltip": "All models/datasets in a private project are private, and all models/datasets in a public project are public.",
+    "submit": "Create Model",
+    "uploadTip": "After creating the model, you can upload files using the command line.",
+    "modelNameRequired": "Please enter a model name",
+    "modelNameInvalid": "Invalid model name format",
+    "projectRequired": "Please select a project",
+    "success": "Model created successfully",
+    "error": "Failed to create model"
   }
 }

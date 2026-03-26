@@ -514,6 +514,9 @@
         "sourceRegistry": {
           "$ref": "#/definitions/v1alpha1Registry",
           "description": "post or put do not require this field."
+        },
+        "targetProjectName": {
+          "type": "string"
         }
       }
     },
@@ -539,6 +542,9 @@
         "targetRegistry": {
           "$ref": "#/definitions/v1alpha1Registry",
           "description": "post or put do not require this field."
+        },
+        "targetProjectName": {
+          "type": "string"
         }
       }
     },

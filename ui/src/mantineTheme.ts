@@ -1,9 +1,101 @@
-import { createTheme, rem } from '@mantine/core'
+import {
+  Alert,
+  Anchor,
+  createTheme,
+  Modal,
+  Input,
+  PasswordInput,
+  rem,
+  Tabs,
+} from '@mantine/core'
+import { type CSSVariablesResolver } from '@mantine/core'
 
-import type { CSSVariablesResolver } from '@mantine/core'
+const modalSizeMap = {
+  xs: rem(300),
+  sm: rem(390),
+  md: rem(480),
+} as const
+
+const isMappedModalSize = (size: unknown): size is keyof typeof modalSizeMap => (
+  typeof size === 'string' && Object.prototype.hasOwnProperty.call(modalSizeMap, size)
+)
 
 export const mantineTheme = createTheme({
   primaryColor: 'cyan',
+  components: {
+    Modal: Modal.extend({
+      vars: (_, props) => ({
+        root: {
+          '--modal-size': isMappedModalSize(props.size) ? modalSizeMap[props.size] : undefined,
+        },
+        content: {
+          '--paper-radius': rem(12),
+        },
+      }),
+    }),
+    ModalHeader: Modal.Header.extend({
+      defaultProps: {
+        px: 'lg',
+        py: 'md',
+      },
+    }),
+    ModalBody: Modal.Body.extend({
+      defaultProps: {
+        p: 'lg',
+        pt: 0,
+      },
+    }),
+    Tabs: Tabs.extend({
+      vars: () => ({
+        root: {},
+        list: {
+          '--tabs-list-gap': rem(20),
+        },
+      }),
+    }),
+    TabsTab: Tabs.Tab.extend({
+      defaultProps: {
+        lh: rem(20),
+        fw: 600,
+        px: 12,
+        pt: 8,
+        pb: 6,
+      },
+    }),
+    Alert: Alert.extend({
+      defaultProps: {
+        px: 'md',
+        py: 'sm',
+        bd: 'none',
+      },
+    }),
+    InputWrapper: Input.Wrapper.extend({
+      defaultProps: {
+        c: 'gray.7',
+        labelProps: {
+          style: {
+            lineHeight: '20px',
+            marginBottom: '6px',
+          },
+        },
+      },
+    }),
+    PasswordInput: PasswordInput.extend({
+      defaultProps: {
+        labelProps: {
+          style: {
+            lineHeight: '20px',
+            marginBottom: '6px',
+          },
+        },
+      },
+    }),
+    Anchor: Anchor.extend({
+      defaultProps: {
+        c: 'blue.6',
+      },
+    }),
+  },
 })
 
 export const cssVariablesResolver: CSSVariablesResolver = () => ({

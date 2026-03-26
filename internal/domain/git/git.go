@@ -41,9 +41,9 @@ type Commit struct {
 	AuthorDate     time.Time `json:"authorDate"`
 	CommitterName  string    `json:"committerName"`
 	CommitterEmail string    `json:"committerEmail"`
+	CommitterDate  time.Time `json:"committerDate"`
 	Diff           string    `json:"diff"`
 	CreatedAt      time.Time `json:"createdAt"`
-	UpdatedAt      time.Time `json:"updatedAt"`
 }
 
 // Diff represents a file change in a commit.
@@ -74,6 +74,15 @@ type TreeEntry struct {
 	Commit *Commit  `json:"commit,omitempty"`
 }
 
+// RepoMetadataFiles holds raw metadata-related files loaded from a git repo.
+// File interpretation stays in the model domain; git only loads bytes.
+type RepoMetadataFiles struct {
+	ReadmeContent        []byte
+	ConfigJSON           []byte
+	SafetensorsIndexJSON []byte
+	Size                 int64
+}
+
 type GitRepository struct {
 	RemoteRegistryURL  string
 	RemoteProjectName  string
@@ -86,27 +95,38 @@ type GitRepository struct {
 // IGitRepo defines the repository interface for Git operations on models.
 type IGitRepo interface {
 	// CreateRepository initializes a Git repository.
-	CreateRepository(ctx context.Context, project, name string) error
+	// repoType: "models" or "datasets"
+	CreateRepository(ctx context.Context, repoType, project, name string) error
 
 	// DeleteRepository removes the Git repository.
-	DeleteRepository(ctx context.Context, project, name string) error
+	// repoType: "models" or "datasets"
+	DeleteRepository(ctx context.Context, repoType, project, name string) error
 
 	// ListRevisions returns all branches and tags for a model.
-	ListRevisions(ctx context.Context, project, name string) (*Revisions, error)
+	// repoType: "models" or "datasets"
+	ListRevisions(ctx context.Context, repoType, project, name string) (*Revisions, error)
 
 	// ListCommits returns the commit history for a model.
-	ListCommits(ctx context.Context, project, name, revision string, page, pageSize int) ([]*Commit, int64, error)
+	// repoType: "models" or "datasets"
+	ListCommits(ctx context.Context, repoType, project, name, revision string, page, pageSize int) ([]*Commit, int64, error)
 
 	// GetCommit returns a specific commit by ID.
-	GetCommit(ctx context.Context, project, name, commitID string) (*Commit, error)
+	// repoType: "models" or "datasets"
+	GetCommit(ctx context.Context, repoType, project, name, commitID string) (*Commit, error)
 
 	// GetTree returns the file tree at a specific revision and path.
-	GetTree(ctx context.Context, project, name, revision, path string) ([]*TreeEntry, error)
+	// repoType: "models" or "datasets"
+	GetTree(ctx context.Context, repoType, project, name, revision, path string) ([]*TreeEntry, error)
 
 	// GetBlob returns the content of a file at a specific revision.
-	GetBlob(ctx context.Context, project, name, revision, path string) (*TreeEntry, error)
+	// repoType: "models" or "datasets"
+	GetBlob(ctx context.Context, repoType, project, name, revision, path string) (*TreeEntry, error)
 
 	Clone(ctx context.Context, gitRepository *GitRepository) error
 
 	Pull(ctx context.Context, gitRepository *GitRepository) error
+
+	// ExtractMetadata reads metadata-related raw files from a Git repository.
+	// repoType: "models" or "datasets"
+	ExtractMetadata(ctx context.Context, repoType, project, name string) (*RepoMetadataFiles, error)
 }

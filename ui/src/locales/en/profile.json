@@ -48,7 +48,7 @@
     "ACCESS_TOKEN_STATUS_UNKNOWN": "Unknown"
   },
   "tokenPermanent": "Never",
-  "tokenHint": "Access tokens can be used to access open APIs and for continuous deployment. A token is only shown once upon creation. If you lose it, please create a new one.",
+  "tokenHint": "Access tokens authenticate CLI and API requests and provide access to repositories your account is authorized to use. Each token is shown only once—store it securely. If a token is lost or exposed, delete it and create a new one.",
   "deleteToken": "Delete Token",
   "deleteTokenConfirm": "Are you sure you want to delete token {{name}}? This action cannot be undone.",
   "tokenCreated": "Token created successfully",

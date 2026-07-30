@@ -71,9 +71,14 @@ function replicationFormBaseSchema() {
     bandwidth: z.string().trim().optional(),
     bandwidthUnit: z.enum(replicationBandwidthUnitValues),
     isOverwrite: z.boolean(),
-    // Phase 1 backend contract only requires resourceName to be present.
-    // Keep validation limited to "required" for now and defer pattern checks.
-    resourceName: z.string().trim().min(1, t('routes.admin.replications.validation.resourceNameRequired')),
+    resourceName: z
+      .string()
+      .trim()
+      .min(1, t('routes.admin.replications.validation.resourceNameRequired'))
+      .refine(
+        value => !value.startsWith('/') && !value.endsWith('/'),
+        t('routes.admin.replications.validation.resourceNameInvalidSlash'),
+      ),
     resourceTypes: z.array(z.enum(replicationResourceTypeValues)),
     sourceRegistryId: z.number(),
     targetProjectName: z.string().trim().optional(),

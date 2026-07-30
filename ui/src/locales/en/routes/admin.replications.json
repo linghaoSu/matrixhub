@@ -64,7 +64,7 @@
     },
     "targetRegistry": "Target Registry",
     "target": "Target",
-    "targetHint": "Specify the target project. If left empty, resources are placed into a project with the same name as in the source registry.",
+    "targetHint": "Specify the target project. The project must already exist in the target registry, or the sync will fail. If left empty, resources are placed into a project with the same name as in the source registry.",
     "targetProjectName": "Target Project",
     "targetProjectNamePlaceholder": "e.g., my-project",
     "triggerType": "Trigger Mode",
@@ -84,7 +84,8 @@
     "cronRequired": "Cron expression is required",
     "cronInvalid": "Enter a five-field cron expression",
     "sourceRegistryRequired": "Source registry is required",
-    "targetRegistryRequired": "Target registry is required"
+    "targetRegistryRequired": "Target registry is required",
+    "targetProjectNameInvalid": "Enter a valid project name (lowercase letters, numbers, \".\", \"_\", \"-\"; no slashes)"
   },
   "notifications": {
     "createSuccess": "Sync rule created successfully",

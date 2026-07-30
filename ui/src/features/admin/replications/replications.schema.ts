@@ -6,7 +6,9 @@ import {
 import { z } from 'zod'
 
 import i18n from '@/i18n'
-import { withNameStartCharRule, withNameValidCharsRule } from '@/shared/validation'
+import {
+  NAME_START_CHAR_REGEX, NAME_VALID_CHARS_REGEX, withNameStartCharRule, withNameValidCharsRule,
+} from '@/shared/validation'
 
 import { isFiveFieldCronExpression } from './replications.utils'
 
@@ -125,6 +127,17 @@ export function createReplicationFormSchema() {
         code: 'custom',
         message: t('routes.admin.replications.validation.targetRegistryRequired'),
         path: ['targetRegistryId'],
+      })
+    }
+
+    if (
+      data.targetProjectName
+      && (!NAME_START_CHAR_REGEX.test(data.targetProjectName) || !NAME_VALID_CHARS_REGEX.test(data.targetProjectName))
+    ) {
+      ctx.addIssue({
+        code: 'custom',
+        message: t('routes.admin.replications.validation.targetProjectNameInvalid'),
+        path: ['targetProjectName'],
       })
     }
   })

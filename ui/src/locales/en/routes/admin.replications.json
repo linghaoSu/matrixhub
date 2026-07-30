@@ -55,8 +55,8 @@
     "sourceRegistryHint": "Create a registry first in Registry Management before selecting it here.",
     "resourceFilter": "Resource Filter",
     "resourceName": "Resource Name",
-    "resourceNamePlaceholder": "e.g., model-name or project/model-name (no leading slash)",
-    "resourceFilterHint": "Filters resources by name. Use the format \"model-name\" or \"project/model-name\" without a leading slash. Leave it empty or use \"*\" to match all resources; \"qwen/**\" only matches resources under \"qwen\". See the user guide for more patterns.",
+    "resourceNamePlaceholder": "e.g., my-project/model-name (no leading slash)",
+    "resourceFilterHint": "Filters resources by name. For push rules, use the full \"project/model-name\" path of the local resource — the project part is required. For pull rules, use the remote path such as \"qwen/model-name\"; \"*\" matches all resources and \"qwen/**\" matches all resources under \"qwen\". Do not start with a slash. See the user guide for more patterns.",
     "resourceTypes": {
       "label": "Resource Types",
       "model": "Model",
@@ -80,7 +80,8 @@
   },
   "validation": {
     "resourceNameRequired": "Resource name is required",
-    "resourceNameInvalidSlash": "Resource name must not start or end with \"/\" (e.g., use \"model-name\" or \"project/model-name\", not \"/model-name\")",
+    "resourceNameInvalidSlash": "Resource name must not start or end with \"/\" (e.g., use \"my-project/model-name\", not \"/model-name\")",
+    "resourceNameProjectRequired": "For push rules, include the local project, e.g. \"my-project/model-name\"",
     "resourceTypesRequired": "At least one resource type is required",
     "cronRequired": "Cron expression is required",
     "cronInvalid": "Enter a five-field cron expression",

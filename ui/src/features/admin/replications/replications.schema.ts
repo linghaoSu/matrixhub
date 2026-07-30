@@ -98,6 +98,17 @@ export function createReplicationFormSchema() {
       })
     }
 
+    if (
+      data.policyType === SyncPolicyType.SYNC_POLICY_TYPE_PUSH_BASE
+      && !/^[^/]+\/.+$/.test(data.resourceName.trim())
+    ) {
+      ctx.addIssue({
+        code: 'custom',
+        message: t('routes.admin.replications.validation.resourceNameProjectRequired'),
+        path: ['resourceName'],
+      })
+    }
+
     if (data.triggerType === TriggerType.TRIGGER_TYPE_SCHEDULED) {
       const cronResult = cronExpressionSchema.safeParse(data.cronExpression)
 

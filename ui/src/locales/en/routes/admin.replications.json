@@ -64,7 +64,7 @@
     },
     "targetRegistry": "Target Registry",
     "target": "Target",
-    "targetHint": "Specify the target project. The project must already exist in the target registry, or the sync will fail. If left empty, resources are placed into a project with the same name as in the source registry.",
+    "targetHint": "Specify the target project. For push rules, the project must already exist in the target registry, or the sync will fail. For pull rules, the local project is created automatically if it does not exist.",
     "targetProjectName": "Target Project",
     "targetProjectNamePlaceholder": "e.g., my-project",
     "triggerType": "Trigger Mode",
@@ -85,6 +85,7 @@
     "cronInvalid": "Enter a five-field cron expression",
     "sourceRegistryRequired": "Source registry is required",
     "targetRegistryRequired": "Target registry is required",
+    "targetProjectNameRequired": "Target project is required for push rules",
     "targetProjectNameInvalid": "Enter a valid project name (lowercase letters, numbers, \".\", \"_\", \"-\"; no slashes)"
   },
   "notifications": {

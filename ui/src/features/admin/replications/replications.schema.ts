@@ -131,6 +131,17 @@ export function createReplicationFormSchema() {
     }
 
     if (
+      data.policyType === SyncPolicyType.SYNC_POLICY_TYPE_PUSH_BASE
+      && !data.targetProjectName
+    ) {
+      ctx.addIssue({
+        code: 'custom',
+        message: t('routes.admin.replications.validation.targetProjectNameRequired'),
+        path: ['targetProjectName'],
+      })
+    }
+
+    if (
       data.targetProjectName
       && (!NAME_START_CHAR_REGEX.test(data.targetProjectName) || !NAME_VALID_CHARS_REGEX.test(data.targetProjectName))
     ) {

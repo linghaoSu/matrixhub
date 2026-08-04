@@ -42,6 +42,9 @@
         "editor": "开发权限",
         "viewer": "只读权限"
       },
+      "roleDescription": {
+        "hint": "<0>查看权限说明文档</0>了解更多详情。"
+      },
       "actions": {
         "editRole": "编辑权限",
         "remove": "删除"

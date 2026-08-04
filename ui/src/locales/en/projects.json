@@ -42,6 +42,9 @@
         "editor": "Editor",
         "viewer": "Viewer"
       },
+      "roleDescription": {
+        "hint": "<0>View permission documentation</0> for more details."
+      },
       "actions": {
         "editRole": "Edit Permission",
         "remove": "Remove"

@@ -12,7 +12,7 @@ import { ModalWrapper } from '@/shared/components/ModalWrapper'
 import { useForm } from '@/shared/hooks/useForm'
 import { fieldError } from '@/shared/utils/form'
 
-import { useProjectRoleOptions } from '../member.utils'
+import { useProjectRoleDescription, useProjectRoleOptions } from '../member.utils'
 import { updateMemberRoleMutationOptions } from '../members.mutation'
 
 import type { ProjectMember } from '@matrixhub/api-ts/v1alpha1/project.pb'
@@ -56,6 +56,7 @@ export function EditRoleModal({
   })
 
   const roleOptions = useProjectRoleOptions()
+  const roleDescription = useProjectRoleDescription()
 
   const handleClose = () => {
     form.reset()
@@ -93,6 +94,8 @@ export function EditRoleModal({
               withAsterisk
               allowDeselect={false}
               data={roleOptions}
+              inputWrapperOrder={['label', 'input', 'error', 'description']}
+              description={roleDescription}
               value={field.state.value || null}
               onChange={value => field.handleChange(value ?? '')}
               error={fieldError(field)}

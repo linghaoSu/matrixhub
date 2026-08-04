@@ -1,5 +1,6 @@
 import { Select, Stack } from '@mantine/core'
 import { MemberType } from '@matrixhub/api-ts/v1alpha1/project.pb'
+import { ProjectRoleType } from '@matrixhub/api-ts/v1alpha1/role.pb'
 import { Users } from '@matrixhub/api-ts/v1alpha1/user.pb'
 import { useStore } from '@tanstack/react-form'
 import {
@@ -13,10 +14,8 @@ import { ModalWrapper } from '@/shared/components/ModalWrapper'
 import { useForm } from '@/shared/hooks/useForm'
 import { fieldError } from '@/shared/utils/form'
 
-import { useProjectRoleOptions } from '../member.utils'
+import { useProjectRoleDescription, useProjectRoleOptions } from '../member.utils'
 import { addMemberMutationOptions } from '../members.mutation'
-
-import type { ProjectRoleType } from '@matrixhub/api-ts/v1alpha1/role.pb'
 
 interface AddMemberModalProps {
   opened: boolean
@@ -27,7 +26,7 @@ interface AddMemberModalProps {
 const defaultValues = {
   memberType: MemberType.MEMBER_TYPE_USER as string,
   memberId: '' as string,
-  role: '' as string,
+  role: ProjectRoleType.ROLE_TYPE_PROJECT_VIEWER as string,
 }
 
 export function AddMemberModal({
@@ -65,9 +64,10 @@ export function AddMemberModal({
     },
   ]
 
-  const roleOptions = useProjectRoleOptions()
-
   const memberType = useStore(form.store, s => s.values.memberType)
+
+  const roleOptions = useProjectRoleOptions()
+  const roleDescription = useProjectRoleDescription()
 
   const { data: usersData } = useQuery({
     queryKey: ['users', 'list'],
@@ -147,7 +147,10 @@ export function AddMemberModal({
             <Select
               label={t('projects.detail.membersPage.addMemberModal.roleType')}
               withAsterisk
+              allowDeselect={false}
               data={roleOptions}
+              inputWrapperOrder={['label', 'input', 'error', 'description']}
+              description={roleDescription}
               value={field.state.value || null}
               onChange={value => field.handleChange(value ?? '')}
               error={fieldError(field)}

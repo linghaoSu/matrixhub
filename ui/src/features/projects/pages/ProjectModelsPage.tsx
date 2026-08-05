@@ -4,6 +4,7 @@ import {
   Space,
   Stack,
 } from '@mantine/core'
+import { ProjectRoleType } from '@matrixhub/api-ts/v1alpha1/role.pb'
 import {
   IconClock,
   IconCube,
@@ -13,6 +14,7 @@ import { getRouteApi, Link } from '@tanstack/react-router'
 import { startTransition } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import { useProjectRole } from '@/features/auth/useProjectRole'
 import { projectModelsQueryOptions } from '@/features/models/models.query.ts'
 import { Pagination } from '@/shared/components/Pagination'
 import { ModelCard } from '@/shared/components/resource-card/ModelCard.tsx'
@@ -35,6 +37,10 @@ export function ProjectModelsPage() {
     page,
   } = projectModelsRouteApi.useSearch()
   const { t } = useTranslation()
+
+  const projectRole = useProjectRole(projectId)
+  const canCreateModel = projectRole === ProjectRoleType.ROLE_TYPE_PROJECT_ADMIN
+    || projectRole === ProjectRoleType.ROLE_TYPE_PROJECT_EDITOR
 
   const {
     data,
@@ -127,14 +133,16 @@ export function ProjectModelsPage() {
             }}
           />
 
-          <Link to="/models/new" search={{ projectId }}>
-            <Button
-              radius={6}
-              leftSection={<IconCube size={16} />}
-            >
-              {t('projects.detail.modelsPage.create')}
-            </Button>
-          </Link>
+          {canCreateModel && (
+            <Link to="/models/new" search={{ projectId }}>
+              <Button
+                radius={6}
+                leftSection={<IconCube size={16} />}
+              >
+                {t('projects.detail.modelsPage.create')}
+              </Button>
+            </Link>
+          )}
         </SearchToolbar>
 
         <Space h="lg"></Space>

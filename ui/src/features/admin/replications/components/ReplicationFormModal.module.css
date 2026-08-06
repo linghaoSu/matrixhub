@@ -25,5 +25,6 @@
 
 .inlineFieldSectionLabel {
   min-width: 80px;
+  max-width: 100%;
   width: auto;
 }

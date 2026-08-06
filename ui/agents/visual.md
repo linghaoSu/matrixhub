@@ -29,6 +29,19 @@ Do not copy Figma colors mechanically when the same intent is already covered by
 
 ---
 
+## Constrained-width form modals (multilingual)
+
+Rules for form modals whose labels vary in length across locales (e.g. English labels are wider than Chinese):
+
+- **Modal width**: widen within the theme size map only (`xs` 300 / `sm` 390 / `md` 480 — see `src/mantine-theme/components/Modal.ts`). Do not introduce ad-hoc pixel modal widths.
+- **Inline label columns** (labels rendered as an input `leftSection`): all labels in a group share one column width, computed from the widest translated label and clamped to min 80px / max 160px. Use `getInlineLabelColumnWidth` from `src/shared/utils/measureTextWidth.ts`, recomputed on locale change.
+- **Overflow fallback**: labels wider than the max clamp truncate with `Text truncate="end"` wrapped in a `Tooltip` that shows the full label.
+- **Long tags and selected values** inside inputs must wrap or truncate with a tooltip; content must never overflow the modal.
+
+Reference implementation: `src/features/admin/replications/components/ReplicationFormModal.tsx`.
+
+---
+
 ## Figma assets
 
 When implementing from Figma:

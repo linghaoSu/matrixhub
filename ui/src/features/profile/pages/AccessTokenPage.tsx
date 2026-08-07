@@ -121,14 +121,13 @@ export function AccessTokenPage() {
           onClick={handleRefresh}
           aria-label="refresh"
           c="gray.6"
-          size={24}
+          size="lg"
         >
-          <IconRefresh />
+          <IconRefresh size={24} />
         </ActionIcon>
         <Button
           leftSection={<IconKey size={16} />}
           onClick={openCreate}
-          size="xs"
         >
           {t('profile.createToken')}
         </Button>

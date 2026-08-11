@@ -61,6 +61,7 @@
     "copyDescription": "新令牌仅展示一次，请立即复制并妥善保存。",
     "validation": {
       "tokenRequired": "请输入新令牌",
+      "tokenFormat": "令牌长度需在 {{min}} 到 {{max}} 之间，且至少包含一个大写字母、一个小写字母和一个数字",
       "confirmTokenRequired": "请再次输入新令牌",
       "tokenMismatch": "两次输入的令牌不一致"
     }

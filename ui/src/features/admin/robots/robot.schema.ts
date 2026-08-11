@@ -45,6 +45,12 @@ export const createRobotAccountFormSchema = (t: TFunction) => z.object({
   }
 })
 
+export const ROBOT_TOKEN_MIN_LENGTH = 8
+export const ROBOT_TOKEN_MAX_LENGTH = 20
+export const ROBOT_TOKEN_PATTERN = new RegExp(
+  `^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{${ROBOT_TOKEN_MIN_LENGTH},${ROBOT_TOKEN_MAX_LENGTH}}$`,
+)
+
 export const refreshRobotTokenFormDefaults = {
   autoGenerate: true,
   token: '',
@@ -68,6 +74,15 @@ export const refreshRobotTokenSchema = z.object({
     ctx.addIssue({
       code: 'custom',
       message: t('routes.admin.robots.refreshTokenModal.validation.tokenRequired'),
+      path: ['token'],
+    })
+  } else if (!ROBOT_TOKEN_PATTERN.test(value.token)) {
+    ctx.addIssue({
+      code: 'custom',
+      message: t('routes.admin.robots.refreshTokenModal.validation.tokenFormat', {
+        min: ROBOT_TOKEN_MIN_LENGTH,
+        max: ROBOT_TOKEN_MAX_LENGTH,
+      }),
       path: ['token'],
     })
   }

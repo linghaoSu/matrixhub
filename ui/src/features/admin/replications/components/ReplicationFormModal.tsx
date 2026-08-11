@@ -28,7 +28,6 @@ import { FieldHintLabel } from '@/shared/components/FieldHintLabel'
 import { ModalWrapper } from '@/shared/components/ModalWrapper'
 import { useForm } from '@/shared/hooks/useForm'
 import { fieldError } from '@/shared/utils/form'
-import { getInlineLabelColumnWidth } from '@/shared/utils/measureTextWidth'
 
 import {
   createReplicationMutationOptions,
@@ -60,22 +59,18 @@ import type {
 
 const BANDWIDTH_MIN = -1
 const BANDWIDTH_MAX = 1048576
-const INLINE_FIELD_LABEL_MIN_WIDTH = 80
-const INLINE_FIELD_LABEL_MAX_WIDTH = 160
-
-function buildInlineFieldProps(labelWidth: number) {
-  return {
-    variant: 'unstyled' as const,
-    leftSectionWidth: labelWidth,
-    leftSectionProps: {
-      className: classes.inlineFieldSection,
-    },
-    classNames: {
-      wrapper: classes.inlineFieldWrapper,
-      input: classes.inlineFieldInput,
-    },
-  } as const
-}
+// The inline label column width is locale-dependent and lives in the CSS module
+// (`--inline-field-label-width`), so all three fields share one aligned column.
+const inlineFieldProps = {
+  variant: 'unstyled' as const,
+  leftSectionProps: {
+    className: classes.inlineFieldSection,
+  },
+  classNames: {
+    wrapper: classes.inlineFieldWrapper,
+    input: classes.inlineFieldInput,
+  },
+} as const
 
 function renderInlineFieldSection(label: string) {
   return (
@@ -297,20 +292,6 @@ export function ReplicationFormModal({
     form.store,
     state => state.values.triggerType === TriggerType.TRIGGER_TYPE_SCHEDULED,
   )
-
-  const inlineFieldProps = useMemo(() => buildInlineFieldProps(
-    getInlineLabelColumnWidth(
-      [
-        t('routes.admin.replications.form.resourceName'),
-        t('routes.admin.replications.form.resourceTypes.label'),
-        t('routes.admin.replications.form.targetProjectName'),
-      ],
-      {
-        min: INLINE_FIELD_LABEL_MIN_WIDTH,
-        max: INLINE_FIELD_LABEL_MAX_WIDTH,
-      },
-    ),
-  ), [t])
 
   const handleSubmit = () => {
     void form.handleSubmit()

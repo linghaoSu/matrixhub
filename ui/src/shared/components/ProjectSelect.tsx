@@ -3,6 +3,7 @@ import {
   Group,
   InputBase,
   type InputBaseProps,
+  ScrollArea,
   Text,
   useCombobox,
 } from '@mantine/core'
@@ -120,11 +121,18 @@ export function ProjectSelect({
 
       <Combobox.Dropdown>
         <Combobox.Options>
-          {data.map(option => (
-            <Combobox.Option value={option.name as string} key={option.name}>
-              <SelectedProjectDisplay name={option.name} type={option.type} />
-            </Combobox.Option>
-          ))}
+          <ScrollArea.Autosize
+            mah={220}
+            type="auto"
+            scrollbarSize="var(--combobox-padding)"
+            offsetScrollbars="y"
+          >
+            {data.map(option => (
+              <Combobox.Option value={option.name as string} key={option.name}>
+                <SelectedProjectDisplay name={option.name} type={option.type} />
+              </Combobox.Option>
+            ))}
+          </ScrollArea.Autosize>
         </Combobox.Options>
       </Combobox.Dropdown>
     </Combobox>

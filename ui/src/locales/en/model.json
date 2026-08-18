@@ -77,6 +77,8 @@
     "submit": "Create Model",
     "uploadTip": "After creating the model, you can upload files using the command line.",
     "createProject": "Create Project",
+    "emptyProjectTitle": "No projects yet",
+    "emptyProjectDescription": "Create a project first. It will be selected automatically.",
     "modelNameInvalid": "Invalid model name format",
     "success": "Model created successfully",
     "error": "Failed to create model"

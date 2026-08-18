@@ -1,14 +1,19 @@
 import {
+  Anchor,
   Alert,
-  Button, Group,
+  Box,
+  Button,
+  Group,
   rem,
   Stack,
   Text,
   TextInput,
 } from '@mantine/core'
-import { IconInfoCircle } from '@tabler/icons-react'
+import { IconArrowUpRight, IconInfoCircle } from '@tabler/icons-react'
 import { useMutation } from '@tanstack/react-query'
-import { useNavigate, useRouter } from '@tanstack/react-router'
+import {
+  Link, useNavigate, useRouter,
+} from '@tanstack/react-router'
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -117,16 +122,34 @@ export function ModelCreatePage({ initialProjectId = '' }: ModelCreatePageProps)
             validators={{ onChange: projectIdValidator }}
           >
             {field => (
-              <ProjectSelect
-                data={projects}
-                value={field.state.value}
-                onChange={field.handleChange}
-                inputProps={{
-                  disabled: !!initialProjectId,
-                  onBlur: field.handleBlur,
-                  error: fieldError(field),
-                }}
-              />
+              <Group align="flex-end" wrap="nowrap">
+                <Box flex={1}>
+                  <ProjectSelect
+                    data={projects}
+                    value={field.state.value}
+                    onChange={field.handleChange}
+                    inputProps={{
+                      disabled: !!initialProjectId,
+                      onBlur: field.handleBlur,
+                      error: fieldError(field),
+                    }}
+                  />
+                </Box>
+                {!initialProjectId && (
+                  <Anchor
+                    component={Link}
+                    to="/projects"
+                    pb="xs"
+                    size="sm"
+                    flex="0 0 auto"
+                  >
+                    <Group gap={4} wrap="nowrap">
+                      {t('model.create.createProject')}
+                      <IconArrowUpRight size={16} />
+                    </Group>
+                  </Anchor>
+                )}
+              </Group>
             )}
           </form.Field>
 

@@ -9,7 +9,7 @@ import {
   Text,
   TextInput,
 } from '@mantine/core'
-import { IconArrowUpRight, IconInfoCircle } from '@tabler/icons-react'
+import { IconExternalLink, IconInfoCircle } from '@tabler/icons-react'
 import { useMutation } from '@tanstack/react-query'
 import {
   Link, useNavigate, useRouter,
@@ -140,12 +140,18 @@ export function ModelCreatePage({ initialProjectId = '' }: ModelCreatePageProps)
                     component={Link}
                     to="/projects"
                     pb="xs"
-                    size="sm"
+                    size="md"
+                    c="var(--mantine-color-text)"
+                    underline="never"
                     flex="0 0 auto"
                   >
-                    <Group gap={4} wrap="nowrap">
+                    <Group gap={6} wrap="nowrap">
                       {t('model.create.createProject')}
-                      <IconArrowUpRight size={16} />
+                      <IconExternalLink
+                        size={28}
+                        stroke={1.75}
+                        color="var(--mantine-primary-color-filled)"
+                      />
                     </Group>
                   </Anchor>
                 )}

@@ -1,4 +1,5 @@
 import {
+  CheckIcon,
   Combobox,
   Group,
   InputBase,
@@ -82,7 +83,10 @@ export function ProjectSelect({
       combobox.focusTarget()
       setSearch('')
     },
-    onDropdownOpen: () => combobox.focusSearchInput(),
+    onDropdownOpen: () => {
+      combobox.updateSelectedOptionIndex('active', { scrollIntoView: true })
+      combobox.focusSearchInput()
+    },
   })
   const restInputProps = inputProps
 
@@ -146,11 +150,25 @@ export function ProjectSelect({
             offsetScrollbars="y"
           >
             {filteredOptions.length
-              ? filteredOptions.map(option => (
-                  <Combobox.Option value={option.name as string} key={option.name}>
-                    <SelectedProjectDisplay name={option.name} type={option.type} />
-                  </Combobox.Option>
-                ))
+              ? filteredOptions.map((option) => {
+                  const isSelected = option.name === value
+
+                  return (
+                    <Combobox.Option
+                      value={option.name as string}
+                      key={option.name}
+                      active={isSelected}
+                      aria-selected={isSelected}
+                      bg={isSelected ? 'var(--mantine-primary-color-light)' : undefined}
+                      c={isSelected ? 'var(--mantine-primary-color-light-color)' : undefined}
+                    >
+                      <Group justify="space-between" gap="xs" wrap="nowrap">
+                        <SelectedProjectDisplay name={option.name} type={option.type} />
+                        {isSelected && <CheckIcon size={12} />}
+                      </Group>
+                    </Combobox.Option>
+                  )
+                })
               : <Combobox.Empty>{t('common.noResults')}</Combobox.Empty>}
           </ScrollArea.Autosize>
         </Combobox.Options>

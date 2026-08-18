@@ -7,11 +7,12 @@ import {
   Text,
   useCombobox,
 } from '@mantine/core'
-import { type ComponentProps } from 'react'
+import { type ComponentProps, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { ProjectTypeBadge } from '@/shared/components/badges/ProjectTypeBadge'
 import { FieldHintLabel } from '@/shared/components/FieldHintLabel.tsx'
+import { filterByKeyword } from '@/shared/utils'
 
 export interface ProjectSelectOption {
   name?: string
@@ -74,10 +75,19 @@ export function ProjectSelect({
   inputProps,
 }: ProjectSelectProps) {
   const { t } = useTranslation()
-  const combobox = useCombobox()
+  const [search, setSearch] = useState('')
+  const combobox = useCombobox({
+    onDropdownClose: () => {
+      combobox.resetSelectedOption()
+      combobox.focusTarget()
+      setSearch('')
+    },
+    onDropdownOpen: () => combobox.focusSearchInput(),
+  })
   const restInputProps = inputProps
 
   const selectedProjectOption = data.find(option => option.name === value)
+  const filteredOptions = filterByKeyword(data, search)
 
   return (
     <Combobox
@@ -120,6 +130,14 @@ export function ProjectSelect({
       </Combobox.Target>
 
       <Combobox.Dropdown>
+        <Combobox.Search
+          value={search}
+          placeholder={t('shared.search')}
+          onChange={(event) => {
+            combobox.updateSelectedOptionIndex()
+            setSearch(event.currentTarget.value)
+          }}
+        />
         <Combobox.Options>
           <ScrollArea.Autosize
             mah={220}
@@ -127,11 +145,13 @@ export function ProjectSelect({
             scrollbarSize="var(--combobox-padding)"
             offsetScrollbars="y"
           >
-            {data.map(option => (
-              <Combobox.Option value={option.name as string} key={option.name}>
-                <SelectedProjectDisplay name={option.name} type={option.type} />
-              </Combobox.Option>
-            ))}
+            {filteredOptions.length
+              ? filteredOptions.map(option => (
+                  <Combobox.Option value={option.name as string} key={option.name}>
+                    <SelectedProjectDisplay name={option.name} type={option.type} />
+                  </Combobox.Option>
+                ))
+              : <Combobox.Empty>{t('common.noResults')}</Combobox.Empty>}
           </ScrollArea.Autosize>
         </Combobox.Options>
       </Combobox.Dropdown>

@@ -32,6 +32,7 @@ export function SshKeysPage() {
 
   const [createOpened, createHandlers] = useDisclosure(false)
   const [deleteOpened, deleteHandlers] = useDisclosure(false)
+  const [hintVisible, setHintVisible] = useState(true)
   const [deleteTarget, setDeleteTarget] = useState<SSHKey | null>(null)
 
   const handleDelete = (key: SSHKey) => {
@@ -51,9 +52,12 @@ export function SshKeysPage() {
   return (
     <Stack gap="sm">
       <Alert
+        hidden={!hintVisible}
         icon={<IconInfoCircle size={20} />}
         variant="light"
         color="cyan"
+        withCloseButton
+        onClose={() => setHintVisible(false)}
         styles={{ icon: { marginRight: 6 } }}
       >
         {t('profile.sshKey.hint')}

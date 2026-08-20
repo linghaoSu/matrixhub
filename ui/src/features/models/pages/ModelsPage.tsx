@@ -14,11 +14,11 @@ const { useSearch } = getRouteApi('/(auth)/(app)/models/')
 export function ModelsPage() {
   const search = useSearch()
   const {
-    data, isLoadingError,
+    data, isSuccess,
   } = useQuery(catalogModelsQueryOptions(search))
   const hasActiveFilters = Boolean(search.q || search.task || search.library || search.project)
   const modelCount = data?.pagination?.total ?? data?.items?.length
-  const repositoryIsEmpty = !hasActiveFilters && modelCount === 0
+  const repositoryIsEmpty = isSuccess && !hasActiveFilters && modelCount === 0
 
   return (
     <Flex mih="100%" justify="center" pt="lg" pb="xl">
@@ -55,7 +55,7 @@ export function ModelsPage() {
           flex={76}
           gap="lg"
         >
-          {!repositoryIsEmpty && !isLoadingError && <HotModelList />}
+          {!repositoryIsEmpty && <HotModelList />}
 
           <AllModelList />
         </Stack>

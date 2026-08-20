@@ -13,12 +13,10 @@ const { useSearch } = getRouteApi('/(auth)/(app)/models/')
 
 export function ModelsPage() {
   const search = useSearch()
-  const {
-    data, isSuccess,
-  } = useQuery(catalogModelsQueryOptions(search))
+  const { data } = useQuery(catalogModelsQueryOptions(search))
   const hasActiveFilters = Boolean(search.q || search.task || search.library || search.project)
   const modelCount = data?.pagination?.total ?? data?.items?.length
-  const repositoryIsEmpty = isSuccess && !hasActiveFilters && modelCount === 0
+  const repositoryIsEmpty = !hasActiveFilters && modelCount === 0
 
   return (
     <Flex mih="100%" justify="center" pt="lg" pb="xl">

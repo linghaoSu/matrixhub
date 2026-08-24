@@ -24,7 +24,32 @@ export function renderCommitDiff(
         }
       : undefined
 
-    return parse(isTooBig ? `${fileDiff}\n ` : fileDiff, options)
+    const parsedDiff = parse(isTooBig ? `${fileDiff}\n ` : fileDiff, options)
+
+    if (isTooBig && parsedDiff[0]) {
+      let addedLines = 0
+      let deletedLines = 0
+      let inHunk = false
+
+      for (let lineStart = 0; lineStart < fileDiff.length;) {
+        const lineEnd = fileDiff.indexOf('\n', lineStart)
+
+        if (fileDiff.startsWith('@@', lineStart)) {
+          inHunk = true
+        } else if (inHunk && fileDiff[lineStart] === '+') {
+          addedLines++
+        } else if (inHunk && fileDiff[lineStart] === '-') {
+          deletedLines++
+        }
+
+        lineStart = lineEnd === -1 ? fileDiff.length : lineEnd + 1
+      }
+
+      parsedDiff[0].addedLines = addedLines
+      parsedDiff[0].deletedLines = deletedLines
+    }
+
+    return parsedDiff
   })
 
   return {

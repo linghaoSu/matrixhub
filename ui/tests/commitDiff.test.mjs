@@ -73,8 +73,21 @@ test('commit diffs follow the Hugging Face file size and file count limits', asy
     assert.equal(atLimitResult.html.includes(message), false)
     assert.match(atLimitResult.html, /at-limit\.txt/)
 
+    const oversizedModifiedDiff = [
+      'diff --git a/over-limit.txt b/over-limit.txt',
+      '--- a/over-limit.txt',
+      '+++ b/over-limit.txt',
+      '@@ -1 +1,2 @@',
+      '-old',
+      '+new',
+      `+${'界'.repeat(40_000)}`,
+      '',
+    ].join('\n')
+
+    assert.ok(Buffer.byteLength(oversizedModifiedDiff) > 100_000)
+
     const overLimitResult = renderCommitDiff(
-      sizedFileDiff('over-limit.txt', 100_001, '界'),
+      oversizedModifiedDiff,
       message,
       linkText,
     )
@@ -83,6 +96,8 @@ test('commit diffs follow the Hugging Face file size and file count limits', asy
     assert.equal(overLimitResult.html.includes(message), true)
     assert.match(overLimitResult.html, /data-commit-raw-diff-link/)
     assert.match(overLimitResult.html, />See raw diff<\/a>/)
+    assert.match(overLimitResult.html, /d2h-lines-added">\+2<\/span>/)
+    assert.match(overLimitResult.html, /d2h-lines-deleted">-1<\/span>/)
     assert.ok(overLimitResult.html.length < 10_000)
 
     const changedLines = Array.from({ length: 9_000 }, (_, index) => String(index))

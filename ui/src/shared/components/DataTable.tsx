@@ -383,7 +383,11 @@ export function DataTable<TData extends MRT_RowData>({
     ...(displayColumnDefOptions ?? {}),
     'mrt-row-select': {
       header: '',
+      // `minSize` has to be overridden too: the wrapper's `defaultColumn`
+      // minimum applies to display columns as well and would otherwise win
+      // over this size.
       size: 44,
+      minSize: 44,
       grow: false,
       ...displayColumnDefOptions?.['mrt-row-select'],
     },

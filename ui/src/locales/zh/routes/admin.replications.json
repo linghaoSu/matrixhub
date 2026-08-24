@@ -55,7 +55,6 @@
     "sourceRegistryHint": "需先在“仓库管理”中创建仓库。",
     "resourceFilter": "资源过滤器",
     "resourceName": "资源名称",
-    "resourceNamePlaceholder": "例如：model-name 或 * 表示全部",
     "resourceFilterHint": "过滤资源的名字。不填或者填写“*”匹配所有资源；“qwen/**”匹配“qwen”下的资源。更多的匹配模式请参考用户手册。",
     "resourceTypes": {
       "label": "资源类型",

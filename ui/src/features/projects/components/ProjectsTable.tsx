@@ -34,11 +34,12 @@ function ProjectNameCell({ row }: ProjectCellProps) {
   const name = row.original.name
 
   if (!name) {
-    return <Text fw={600}>-</Text>
+    return <Text size="sm" fw={600}>-</Text>
   }
 
   return (
     <Anchor
+      size="sm"
       fw={600}
       underline="never"
       renderRoot={props => (

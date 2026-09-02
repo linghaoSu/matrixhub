@@ -527,6 +527,11 @@ export function DataTable<TData extends MRT_RowData>({
         }}
         mantineTableBodyRowProps={({ row }) => ({
           bg: row.getIsSelected() ? 'var(--mantine-color-cyan-light)' : undefined,
+          // Keep the last row's bottom border (removed by mantine-react-table
+          // by default) so the table body stays separated from the footer.
+          style: {
+            borderBottom: '1px solid var(--mantine-color-gray-3)',
+          },
         })}
       />
 

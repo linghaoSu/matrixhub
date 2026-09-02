@@ -67,11 +67,12 @@ function ExecutionTaskCell({
   const executionId = row.original.id
 
   if (executionId == null || syncPolicyId == null) {
-    return <Text fw={600}>{executionId ?? '-'}</Text>
+    return <Text size="sm" fw={600}>{executionId ?? '-'}</Text>
   }
 
   return (
     <Anchor
+      size="sm"
       fw={600}
       renderRoot={props => (
         <Link

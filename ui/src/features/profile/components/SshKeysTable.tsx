@@ -54,6 +54,7 @@ function ActionCell({
     <Anchor
       component="button"
       size="sm"
+      c="red"
       onClick={() => onDelete?.(row.original)}
     >
       {t('profile.sshKey.delete.action')}

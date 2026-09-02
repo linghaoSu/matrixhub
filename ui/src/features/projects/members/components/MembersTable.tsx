@@ -116,7 +116,7 @@ function ActionsCell({
         component="button"
         type="button"
         size="sm"
-        c={isSelf ? 'dimmed' : undefined}
+        c={isSelf ? 'dimmed' : 'red'}
         style={isSelf ? { cursor: 'not-allowed' } : undefined}
         onClick={isSelf ? undefined : () => meta?.onRemove?.(row.original)}
       >

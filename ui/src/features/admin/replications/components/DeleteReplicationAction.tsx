@@ -79,7 +79,7 @@ export function DeleteReplicationAction({
       <Button
         variant="transparent"
         size="compact-sm"
-        color="blue"
+        color="red"
         disabled={disabled}
         onClick={open}
       >

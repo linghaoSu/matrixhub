@@ -104,7 +104,7 @@ function ProjectActionsCell({
     <Anchor
       component="button"
       size="sm"
-      c={disabled ? 'dimmed' : undefined}
+      c={disabled ? 'dimmed' : 'red'}
       underline={disabled ? 'never' : 'hover'}
       disabled={disabled}
       style={disabled ? { cursor: 'not-allowed' } : undefined}

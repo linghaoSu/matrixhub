@@ -63,6 +63,7 @@ const ActionCell = ({
     <Anchor
       component="button"
       size="sm"
+      c="red"
       onClick={() => handleDeleteOpen?.(row.original)}
     >
       {t('profile.deleteToken')}

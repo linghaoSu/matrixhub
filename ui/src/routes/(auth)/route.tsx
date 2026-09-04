@@ -166,7 +166,7 @@ function AppNavbar() {
   )
 }
 
-const DOCS_URL = '/docs/'
+const DOCS_URL = '/'
 
 function DocsLink() {
   const { t } = useTranslation()

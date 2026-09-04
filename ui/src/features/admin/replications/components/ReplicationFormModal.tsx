@@ -431,7 +431,6 @@ export function ReplicationFormModal({
                   leftSection={renderInlineFieldSection(
                     t('routes.admin.replications.form.resourceName'),
                   )}
-                  placeholder={t('routes.admin.replications.form.resourceNamePlaceholder')}
                   value={field.state.value}
                   onChange={event => field.handleChange(event.currentTarget.value)}
                   onBlur={field.handleBlur}

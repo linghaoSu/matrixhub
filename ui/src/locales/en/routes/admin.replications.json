@@ -55,7 +55,6 @@
     "sourceRegistryHint": "Create a registry first in Registry Management before selecting it here.",
     "resourceFilter": "Resource Filter",
     "resourceName": "Resource Name",
-    "resourceNamePlaceholder": "e.g., model-name or * for all",
     "resourceFilterHint": "Filters resources by name. Leave it empty or use \"*\" to match all resources; \"qwen/**\" only matches resources under \"qwen\". See the user guide for more patterns.",
     "resourceTypes": {
       "label": "Resource Types",

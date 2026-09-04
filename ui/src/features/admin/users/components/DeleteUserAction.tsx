@@ -94,7 +94,7 @@ export function DeleteUserAction({
       <Button
         variant="transparent"
         size="compact-sm"
-        color="blue"
+        color="red"
         disabled={disabled}
         onClick={open}
       >

@@ -34,11 +34,12 @@ function ProjectNameCell({ row }: ProjectCellProps) {
   const name = row.original.name
 
   if (!name) {
-    return <Text fw={600}>-</Text>
+    return <Text size="sm" fw={600}>-</Text>
   }
 
   return (
     <Anchor
+      size="sm"
       fw={600}
       underline="never"
       renderRoot={props => (
@@ -103,7 +104,7 @@ function ProjectActionsCell({
     <Anchor
       component="button"
       size="sm"
-      c={disabled ? 'dimmed' : undefined}
+      c={disabled ? 'dimmed' : 'red'}
       underline={disabled ? 'never' : 'hover'}
       disabled={disabled}
       style={disabled ? { cursor: 'not-allowed' } : undefined}

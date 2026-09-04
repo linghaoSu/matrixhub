@@ -1,6 +1,5 @@
 import {
   ActionIcon,
-  Anchor,
   Checkbox,
   Group,
   Input,
@@ -20,6 +19,7 @@ import { Trans, useTranslation } from 'react-i18next'
 
 import { allRegistriesQueryOptions } from '@/features/admin/registries/registries.query'
 import { useCurrentUser } from '@/features/auth/auth.query'
+import AnchorLink from '@/shared/components/AnchorLink'
 import { FieldHintLabel } from '@/shared/components/FieldHintLabel.tsx'
 import { ModalWrapper } from '@/shared/components/ModalWrapper'
 import { useForm } from '@/shared/hooks/useForm'
@@ -39,8 +39,6 @@ export interface CreateProjectModalProps {
   onCreated?: (projectName: string) => void | Promise<void>
 }
 
-const REGISTRY_CREATE_PATH = '/admin/registries?create=true'
-
 /**
  * Link to registry creation. Opened in a new tab so the half-filled project
  * form stays untouched, with the usual icon marking the tab switch.
@@ -53,10 +51,10 @@ function RegistryCreateLink({
   size?: MantineSize
 }) {
   return (
-    <Anchor
-      href={REGISTRY_CREATE_PATH}
+    <AnchorLink
+      to="/admin/registries"
+      search={{ create: true }}
       target="_blank"
-      rel="noopener noreferrer"
       size={size}
       inherit={!size}
     >
@@ -64,7 +62,7 @@ function RegistryCreateLink({
         {children}
         <IconExternalLink size={14} />
       </Group>
-    </Anchor>
+    </AnchorLink>
   )
 }
 
@@ -115,10 +113,13 @@ export function CreateProjectModal({
     label: r.name ?? r.url ?? '',
   }))
 
-  // Only treat an empty list as "no registry" once the request has succeeded,
-  // so loading and error states do not show the guidance by mistake.
+  // Both states are decided only once the request has succeeded, so loading
+  // and error states show neither the guidance nor the shortcut, and the row
+  // does not shift as the request settles.
   const showEmptyRegistryHint
     = registriesQuery.isSuccess && registryOptions.length === 0
+  const showCreateRegistryShortcut
+    = registriesQuery.isSuccess && registryOptions.length > 0
 
   // Opened in a new tab so the half-filled project form stays untouched here.
   const registryLink = <RegistryCreateLink />
@@ -214,10 +215,12 @@ export function CreateProjectModal({
               <form.Subscribe selector={s => s.values.enabledProxy}>
                 {enabledProxy => enabledProxy && !showEmptyRegistryHint && (
                   <Group gap="xs" align="center" wrap="nowrap">
-                    <RegistryCreateLink size="sm">
-                      <IconPlus size={14} />
-                      {t('projects.createModal.createRegistry')}
-                    </RegistryCreateLink>
+                    {showCreateRegistryShortcut && (
+                      <RegistryCreateLink size="sm">
+                        <IconPlus size={14} />
+                        {t('projects.createModal.createRegistry')}
+                      </RegistryCreateLink>
+                    )}
                     {refreshRegistriesButton}
                   </Group>
                 )}

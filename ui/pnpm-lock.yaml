@@ -92,6 +92,9 @@ importers:
       markdown-it:
         specifier: ^15.0.0
         version: 15.0.0
+      markdown-it-anchor:
+        specifier: ^9.2.1
+        version: 9.2.1(@types/markdown-it@14.1.2)(markdown-it@15.0.0)
       markdown-it-async:
         specifier: ^2.2.0
         version: 2.2.0
@@ -2692,6 +2695,12 @@ packages:
       dayjs: '>=1.11'
       react: '>=18.0'
       react-dom: '>=18.0'
+
+  markdown-it-anchor@9.2.1:
+    resolution: {integrity: sha512-p6APiLJDFAW2GEvaavDvhIBn7jrX2jLv77NkBGgNacFTurbORYc4pyYySg/mI6mpR6cHQuAtzKtmqgQr4K8dsQ==}
+    peerDependencies:
+      '@types/markdown-it': '*'
+      markdown-it: '*'
 
   markdown-it-async@2.2.0:
     resolution: {integrity: sha512-sITME+kf799vMeO/ww/CjH6q+c05f6TLpn6VOmmWCGNqPJzSh+uFgZoMB9s0plNtW6afy63qglNAC3MhrhP/gg==}
@@ -6405,6 +6414,11 @@ snapshots:
       dayjs: 1.11.20
       react: 19.2.4
       react-dom: 19.2.4(react@19.2.4)
+
+  markdown-it-anchor@9.2.1(@types/markdown-it@14.1.2)(markdown-it@15.0.0):
+    dependencies:
+      '@types/markdown-it': 14.1.2
+      markdown-it: 15.0.0
 
   markdown-it-async@2.2.0:
     dependencies:

@@ -1,4 +1,5 @@
 import DOMPurify from 'dompurify'
+import MarkdownItAnchor from 'markdown-it-anchor'
 import MarkdownItAsync from 'markdown-it-async'
 import MarkdownItGitHubAlerts from 'markdown-it-github-alerts'
 
@@ -49,6 +50,18 @@ const LANG_ALIASES: Record<string, string> = {
 
 let highlighterPromise: Promise<HighlighterCore> | null = null
 let rendererPromise: Promise<Renderer> | null = null
+
+/**
+ * GitHub-style heading slug: lowercase, drop punctuation, spaces to hyphens.
+ * Duplicate headings are suffixed `-1`, `-2`, … by markdown-it-anchor.
+ */
+export function slugifyHeading(text: string): string {
+  return text
+    .trim()
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}\s_-]/gu, '')
+    .replace(/\s+/g, '-')
+}
 
 /** A YAML mapping entry (`key: value`), sequence item, comment, or indented continuation. */
 const YAML_LINE = /^(?:[\w.-]+\s*:(?:\s.*)?|-\s.*|\s+\S.*|#\s.*)?$/
@@ -188,6 +201,10 @@ function createRenderer(): Renderer {
   })
 
   md.use(MarkdownItGitHubAlerts)
+  md.use(MarkdownItAnchor, {
+    slugify: slugifyHeading,
+    tabIndex: false,
+  })
 
   return md
 }

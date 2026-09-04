@@ -2,7 +2,18 @@ import {
   describe, expect, it,
 } from 'vitest'
 
-import { renderMarkdown, stripFrontmatter } from './renderer'
+import {
+  renderMarkdown, slugifyHeading, stripFrontmatter,
+} from './renderer'
+
+describe('slugifyHeading', () => {
+  it('matches GitHub slugs', () => {
+    expect(slugifyHeading('Best Practices')).toBe('best-practices')
+    expect(slugifyHeading('Qwen3 Highlights')).toBe('qwen3-highlights')
+    expect(slugifyHeading('What\'s new? (v2.0)')).toBe('whats-new-v20')
+    expect(slugifyHeading('模型 概览')).toBe('模型-概览')
+  })
+})
 
 describe('stripFrontmatter', () => {
   it('strips a leading YAML mapping block', () => {
@@ -41,6 +52,14 @@ describe('renderMarkdown', () => {
     const html = await renderMarkdown('[Best Practices](#best-practices)')
 
     expect(html).not.toContain('target=')
+  })
+
+  it('gives headings GitHub-style ids so in-page anchors resolve', async () => {
+    const html = await renderMarkdown('## Best Practices\n\n## Best Practices\n\n[go](#best-practices)')
+
+    expect(html).toContain('<h2 id="best-practices">')
+    expect(html).toContain('<h2 id="best-practices-1">')
+    expect(html).not.toContain('tabindex')
   })
 
   it('drops style blocks and non-colour inline styles from raw HTML', async () => {

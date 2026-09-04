@@ -39,7 +39,7 @@ import type {
   MRT_TableOptions,
 } from 'mantine-react-table'
 import type {
-  Dispatch, ReactNode, SetStateAction,
+  Dispatch, MutableRefObject, ReactNode, SetStateAction,
 } from 'react'
 
 // -- Toolbar types --
@@ -170,9 +170,53 @@ function mergeTableOptionProps<TData extends MRT_RowData, TProps extends object>
   }
 }
 
+type TableContainerProps = BoxProps & HTMLPropsRef<HTMLDivElement>
+
+// The wrapper's own `ref` and `className` drive the pinned-shadow tracking and
+// its stylesheet, so they must survive a caller-supplied
+// `mantineTableContainerProps`. Merge those two explicitly instead of letting a
+// plain spread drop them; everything else still overrides as usual.
+//
+// MRT types this `ref` as a ref object rather than a callback, so the two refs
+// cannot be combined into one. The wrapper's ref stays on the element and the
+// caller's is populated from it in an effect.
+function mergeTableContainerProps<TData extends MRT_RowData>(
+  defaults: TableContainerProps & { className: string },
+  props:
+    | TableContainerProps
+    | ((args: { table: MRT_TableInstance<TData> }) => TableContainerProps)
+    | undefined,
+) {
+  const combine = (overrides: TableContainerProps | undefined): TableContainerProps => {
+    if (!overrides) {
+      return defaults
+    }
+
+    const {
+      ref: _callerRef,
+      className: overrideClassName,
+      ...rest
+    } = overrides
+
+    return {
+      ...defaults,
+      ...rest,
+      ref: defaults.ref,
+      className: overrideClassName
+        ? `${defaults.className} ${overrideClassName}`
+        : defaults.className,
+    }
+  }
+
+  if (typeof props === 'function') {
+    return (args: { table: MRT_TableInstance<TData> }) => combine(props(args))
+  }
+
+  return combine(props)
+}
+
 function resolveTableOptionProps<TArgs extends object, TProps extends object>(
-  props: TProps | ((args: TArgs) => TProps) | undefined,
-  args: TArgs,
+  props: TProps | ((args: TArgs) => TProps) | undefined, args: TArgs,
 ) {
   if (!props) {
     return undefined
@@ -246,14 +290,26 @@ function withFilterTooltipLabels<TData extends MRT_RowData>(
 // there is nothing to scroll. Track the container's real scroll position and
 // expose it as data attributes so the stylesheet can hide each side's shadow
 // until that side actually has content scrolled out of view.
-function usePinnedShadowContainerRef() {
+function usePinnedShadowContainerRef(callerRef?: MutableRefObject<HTMLDivElement | null> | null) {
   const containerRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     const element = containerRef.current
 
+    // MRT only accepts one ref object on the container, so a caller-supplied
+    // ref is populated from ours rather than replacing it.
+    if (callerRef) {
+      callerRef.current = element
+    }
+
     if (!element) {
       return
+    }
+
+    const detachCallerRef = () => {
+      if (callerRef) {
+        callerRef.current = null
+      }
     }
 
     const update = () => {
@@ -291,8 +347,9 @@ function usePinnedShadowContainerRef() {
     return () => {
       observer.disconnect()
       element.removeEventListener('scroll', update)
+      detachCallerRef()
     }
-  }, [])
+  }, [callerRef])
 
   return containerRef
 }
@@ -357,7 +414,13 @@ export function DataTable<TData extends MRT_RowData>({
 
   const enhancedColumns = useMemo(() => withFilterTooltipLabels(columns), [columns])
 
-  const containerRef = usePinnedShadowContainerRef()
+  // A container ref is only reachable from the static form of the prop; the
+  // function form is resolved per-render by MRT.
+  const callerContainerRef = typeof mantineTableContainerProps === 'function'
+    ? undefined
+    : mantineTableContainerProps?.ref
+
+  const containerRef = usePinnedShadowContainerRef(callerContainerRef)
 
   const shouldPinRowActions = enableRowActions && pinRowActions
   const actionColumnPinning = initialState?.columnPinning
@@ -574,10 +637,7 @@ export function DataTable<TData extends MRT_RowData>({
           },
           mantinePaperProps,
         )}
-        mantineTableContainerProps={mergeTableOptionProps<
-          TData,
-          BoxProps & HTMLPropsRef<HTMLDivElement>
-        >(
+        mantineTableContainerProps={mergeTableContainerProps<TData>(
           {
             ref: containerRef,
             className: classes.container,

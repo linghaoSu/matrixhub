@@ -11,7 +11,7 @@ import type {
   TextProps,
   TooltipProps,
 } from '@mantine/core'
-import type { ReactNode } from 'react'
+import type { MouseEvent, ReactNode } from 'react'
 
 export interface TruncatedTextProps extends Omit<TextProps, 'truncate' | 'children'> {
   /** Full value. Used both as rendered content and as the tooltip label. */
@@ -22,6 +22,8 @@ export interface TruncatedTextProps extends Omit<TextProps, 'truncate' | 'childr
   children?: ReactNode
   /** Extra props forwarded to the tooltip. */
   tooltipProps?: Omit<TooltipProps, 'children' | 'label'>
+  /** Composed with the internal overflow check rather than replacing it. */
+  onMouseEnter?: (event: MouseEvent<HTMLDivElement>) => void
 }
 
 /**
@@ -34,17 +36,23 @@ export function TruncatedText({
   tooltipLabel,
   children,
   tooltipProps,
+  onMouseEnter,
   ...textProps
 }: TruncatedTextProps) {
   const contentRef = useRef<HTMLDivElement>(null)
   const [overflowing, setOverflowing] = useState(false)
 
-  const syncOverflow = () => {
+  // Composed rather than passed straight to `Text`, so a caller-provided
+  // `onMouseEnter` cannot replace the overflow check and silently disable the
+  // tooltip.
+  const handleMouseEnter = (event: MouseEvent<HTMLDivElement>) => {
     const element = contentRef.current
 
     if (element) {
       setOverflowing(element.scrollWidth > element.clientWidth)
     }
+
+    onMouseEnter?.(event)
   }
 
   const content = (
@@ -52,8 +60,8 @@ export function TruncatedText({
       ref={contentRef}
       size="sm"
       truncate="end"
-      onMouseEnter={syncOverflow}
       {...textProps}
+      onMouseEnter={handleMouseEnter}
     >
       {children ?? value}
     </Text>

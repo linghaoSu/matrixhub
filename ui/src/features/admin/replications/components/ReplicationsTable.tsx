@@ -42,7 +42,7 @@ type ReplicationsTableProps = Omit<DataTableProps<SyncPolicyItem>, 'columns'>
 const EMPTY_VALUE = '-'
 
 function ReplicationTruncatedTextCell({ cell }: ReplicationCellProps) {
-  return <TruncatedText value={cell.getValue<string>() || '-'} />
+  return <TruncatedText value={cell.getValue<string>() || EMPTY_VALUE} />
 }
 
 function ReplicationNameCell({ row }: ReplicationCellProps) {

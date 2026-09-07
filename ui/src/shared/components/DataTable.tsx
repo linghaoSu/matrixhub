@@ -679,10 +679,12 @@ export function DataTable<TData extends MRT_RowData>({
             ...rowProps,
             // Keep the last row's bottom border (removed by mantine-react-table
             // by default) so the table body stays separated from the footer.
-            style: {
-              borderBottom: '1px solid var(--mantine-color-gray-3)',
-              ...rowProps?.style,
-            },
+            // Composed as a Mantine style array so caller styles of any form
+            // (object, theme callback, or array) are preserved and win.
+            style: [
+              { borderBottom: '1px solid var(--mantine-color-gray-3)' },
+              rowProps?.style,
+            ],
           }
         }}
       />

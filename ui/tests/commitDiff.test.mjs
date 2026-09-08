@@ -59,6 +59,7 @@ test('commit diffs follow the Hugging Face file size and file count limits', asy
     const {
       MAX_FILES,
       renderCommitDiff,
+      splitCommitDiff,
     } = await server.ssrLoadModule('/src/shared/components/commit-detail/commitDiff.ts')
     const message = 'The diff for this file is too large to render.'
     const linkText = 'See raw diff'
@@ -94,7 +95,7 @@ test('commit diffs follow the Hugging Face file size and file count limits', asy
 
     assert.equal(overLimitResult.hasTooManyFiles, false)
     assert.equal(overLimitResult.html.includes(message), true)
-    assert.match(overLimitResult.html, /data-commit-raw-diff-link/)
+    assert.match(overLimitResult.html, /data-commit-raw-diff-link="0"/)
     assert.match(overLimitResult.html, />See raw diff<\/a>/)
     assert.match(overLimitResult.html, /d2h-lines-added">\+2<\/span>/)
     assert.match(overLimitResult.html, /d2h-lines-deleted">-1<\/span>/)
@@ -131,6 +132,9 @@ test('commit diffs follow the Hugging Face file size and file count limits', asy
     assert.match(fileLimitResult.html, new RegExp(`file-${MAX_FILES - 1}\\.txt`))
     assert.doesNotMatch(fileLimitResult.html, new RegExp(`file-${MAX_FILES}\\.txt`))
     assert.equal(fileLimitResult.html.split(message).length - 1, MAX_FILES)
+    assert.match(fileLimitResult.html, new RegExp(`data-commit-raw-diff-link="${MAX_FILES - 1}"`))
+    assert.doesNotMatch(fileLimitResult.html, new RegExp(`data-commit-raw-diff-link="${MAX_FILES}"`))
+    assert.equal(splitCommitDiff(oversizedFilesDiff)[MAX_FILES - 1].startsWith(`diff --git a/file-${MAX_FILES - 1}.txt`), true)
   } finally {
     await server.close()
   }

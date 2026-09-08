@@ -18,6 +18,7 @@ import { useTranslation } from 'react-i18next'
 import {
   MAX_FILES,
   renderCommitDiff,
+  splitCommitDiff,
 } from '@/shared/components/commit-detail/commitDiff'
 import { CommitHashCard } from '@/shared/components/commit-detail/CommitHashCard'
 import { CommitMessageSection } from '@/shared/components/commit-detail/CommitMessageSection'
@@ -119,9 +120,9 @@ export function CommitDetail({ commit }: CommitDetailProps) {
     }
   }, [commit?.diff, t])
 
-  const openRawDiff = () => {
+  const openRawDiff = (diff: string) => {
     const rawDiffUrl = URL.createObjectURL(
-      new Blob([commit?.diff ?? ''], { type: 'text/plain;charset=utf-8' }),
+      new Blob([diff], { type: 'text/plain;charset=utf-8' }),
     )
 
     window.open(rawDiffUrl, '_blank', 'noopener,noreferrer')
@@ -130,16 +131,26 @@ export function CommitDetail({ commit }: CommitDetailProps) {
 
   const handleOpenRawDiff = (event: MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault()
-    openRawDiff()
+    openRawDiff(commit?.diff ?? '')
   }
 
   const handleDiffHtmlClick = (event: MouseEvent<HTMLDivElement>) => {
-    if (!(event.target instanceof Element) || !event.target.closest('[data-commit-raw-diff-link]')) {
+    if (!(event.target instanceof Element)) {
+      return
+    }
+
+    const link = event.target.closest<HTMLElement>('[data-commit-raw-diff-link]')
+
+    if (!link) {
       return
     }
 
     event.preventDefault()
-    openRawDiff()
+
+    const fileIndex = Number(link.dataset.commitRawDiffLink)
+    const fileDiff = splitCommitDiff(commit?.diff ?? '')[fileIndex]
+
+    openRawDiff(fileDiff ?? commit?.diff ?? '')
   }
 
   return (

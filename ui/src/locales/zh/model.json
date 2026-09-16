@@ -61,7 +61,9 @@
         "testRequest": "发送测试请求",
         "testRequestHint": "请求体会按模型类型自动切换，替换图片地址和问题后即可运行"
       },
-      "currentTask": "当前模型",
+      "currentTask": "模型类型",
+      "selectTask": "选择模型类型",
+      "unsupportedTask": "无法根据任务标签识别受支持的模型类型。请仅在类型与模型匹配时手动选择。",
       "tasks": {
         "text-generation": "文本生成",
         "image-text-to-text": "图文多模态"
@@ -74,7 +76,6 @@
         "imageUrl": "<图片地址>",
         "image": "请描述这张图片"
       },
-      "otherMethods": "其他方式",
       "viewDocs": "查看 {{engine}} 文档"
     }
   },

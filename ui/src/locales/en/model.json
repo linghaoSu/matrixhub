@@ -62,6 +62,8 @@
         "testRequestHint": "The request body follows the model type. Replace the image URL and prompt, then run it."
       },
       "currentTask": "Model type",
+      "selectTask": "Select model type",
+      "unsupportedTask": "This guide could not infer a supported model type. Select one only if it matches the model.",
       "tasks": {
         "text-generation": "Text generation",
         "image-text-to-text": "Image-text-to-text"
@@ -74,7 +76,6 @@
         "imageUrl": "<image-url>",
         "image": "Describe this image"
       },
-      "otherMethods": "Other methods",
       "viewDocs": "View {{engine}} docs"
     }
   },

@@ -31,16 +31,20 @@ export interface UseModelSnippet {
 /**
  * Pick the task the snippets should target from the model's TASK labels.
  * Only text generation and image-text-to-text are supported; anything else
- * (or a model without task labels) falls back to text generation.
+ * requires the user to choose a supported task explicitly.
  */
-export function resolveUseModelTask(model: Pick<Model, 'labels'>): UseModelTask {
+export function resolveUseModelTask(model: Pick<Model, 'labels'>): UseModelTask | null {
   const tasks = getLabelsByCategory(model.labels, Category.TASK).map(task => task.toLowerCase())
 
   if (tasks.some(task => task === 'image-text-to-text' || task === 'image-to-text')) {
     return 'image-text-to-text'
   }
 
-  return 'text-generation'
+  if (tasks.includes('text-generation')) {
+    return 'text-generation'
+  }
+
+  return null
 }
 
 export function buildEnvSnippet(hfEndpoint: string): UseModelSnippet {
@@ -117,13 +121,6 @@ export function buildTestRequestSnippet(
   }
 }
 
-export function buildDockerSnippet(hfEndpoint: string, modelPath: string): UseModelSnippet {
-  return {
-    lang: 'bash',
-    code: `docker model run ${hfEndpoint.replace(/^https?:\/\//, '')}/${modelPath}`,
-  }
-}
-
 function buildMessages(task: UseModelTask, prompts: SnippetPrompts): string {
   if (task === 'image-text-to-text') {
     return `messages = [{"role": "user", "content": [
@@ -136,6 +133,8 @@ function buildMessages(task: UseModelTask, prompts: SnippetPrompts): string {
 }
 
 export function buildPipelineSnippet(task: UseModelTask, modelPath: string, prompts: SnippetPrompts): UseModelSnippet {
+  const invocation = task === 'image-text-to-text' ? 'pipe(text=messages)' : 'pipe(messages)'
+
   return {
     lang: 'python',
     code: `from transformers import pipeline
@@ -144,7 +143,7 @@ pipe = pipeline("${task}", model="${modelPath}",
                 device_map="auto")
 
 ${buildMessages(task, prompts)}
-result = pipe(text=messages)`,
+result = ${invocation}`,
   }
 }
 

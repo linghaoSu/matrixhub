@@ -60,7 +60,7 @@
  * Shiki emits both palettes as per-token variables on <pre> and each <span>.
  * The active scheme is chosen at the element itself (custom properties resolve
  * where they are declared), and the <pre> background is mirrored onto .root as
- * --shiki-bg so chrome like the copy button can reuse it.
+ * --shiki-light-bg and --shiki-dark-bg so chrome like the copy button can reuse it.
  */
 .shiki :global(pre.shiki),
 .shiki :global(pre.shiki span) {

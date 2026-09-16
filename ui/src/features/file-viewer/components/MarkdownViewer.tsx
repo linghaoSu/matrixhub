@@ -3,6 +3,7 @@ import {
 } from '@mantine/core'
 import { useEffect, useState } from 'react'
 
+import { decodeHash } from '../markdown/hash'
 import { renderMarkdown } from '../markdown/renderer'
 
 import 'github-markdown-css/github-markdown-light.css'
@@ -46,7 +47,7 @@ export function MarkdownViewer({ content }: MarkdownViewerProps) {
       return
     }
 
-    const id = decodeURIComponent(window.location.hash.slice(1))
+    const id = decodeHash(window.location.hash.slice(1))
 
     document.getElementById(id)?.scrollIntoView()
   }, [html])

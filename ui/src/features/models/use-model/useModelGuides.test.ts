@@ -4,7 +4,6 @@ import {
 } from 'vitest'
 
 import {
-  buildDockerSnippet,
   buildEnvSnippet,
   buildLowLevelSnippet,
   buildPipelineSnippet,
@@ -29,14 +28,23 @@ describe('resolveUseModelTask', () => {
     })).toBe('image-text-to-text')
   })
 
-  it('ignores non-TASK labels and falls back to text generation', () => {
+  it('detects text generation from TASK labels', () => {
+    expect(resolveUseModelTask({
+      labels: [{
+        category: Category.TASK,
+        name: 'text-generation',
+      }],
+    })).toBe('text-generation')
+  })
+
+  it('does not guess a task for unsupported or missing TASK labels', () => {
     expect(resolveUseModelTask({
       labels: [{
         category: Category.LIBRARY,
         name: 'image-text-to-text',
       }],
-    })).toBe('text-generation')
-    expect(resolveUseModelTask({})).toBe('text-generation')
+    })).toBeNull()
+    expect(resolveUseModelTask({})).toBeNull()
   })
 })
 
@@ -44,8 +52,6 @@ describe('snippet builders', () => {
   it('uses the configured HF endpoint', () => {
     expect(buildEnvSnippet('https://hub.example.com').code)
       .toContain('export HF_ENDPOINT="https://hub.example.com"')
-    expect(buildDockerSnippet('https://hub.example.com', 'org/model').code)
-      .toBe('docker model run hub.example.com/org/model')
   })
 
   it('switches task and messages structure for multimodal models', () => {
@@ -53,6 +59,7 @@ describe('snippet builders', () => {
 
     expect(pipeline).toContain('pipeline("image-text-to-text"')
     expect(pipeline).toContain('"type": "image", "url": "<image-url>"')
+    expect(pipeline).toContain('result = pipe(text=messages)')
 
     const lowLevel = buildLowLevelSnippet('image-text-to-text', 'org/model', prompts).code
 
@@ -82,6 +89,7 @@ describe('snippet builders', () => {
 
     expect(pipeline).toContain('pipeline("text-generation"')
     expect(pipeline).toContain('"content": "Who are you?"')
+    expect(pipeline).toContain('result = pipe(messages)')
     expect(buildLowLevelSnippet('text-generation', 'org/model', prompts).code).toContain('AutoModelForCausalLM')
   })
 })

@@ -1,5 +1,4 @@
 import {
-  Accordion,
   Alert,
   Anchor,
   Badge,
@@ -26,7 +25,6 @@ import { ShikiCodeBlock } from '@/shared/components/ShikiCodeBlock'
 
 import classes from './UseModelDrawer.module.css'
 import {
-  buildDockerSnippet,
   buildEnvSnippet,
   buildInstallSnippet,
   buildLowLevelSnippet,
@@ -50,7 +48,7 @@ interface UseModelDrawerProps {
   engine: UseModelEngine
   modelPath: string
   /** Task detected from the model's labels; the user may override it inside the drawer. */
-  defaultTask: UseModelTask
+  defaultTask: UseModelTask | null
   onClose: () => void
 }
 
@@ -97,7 +95,7 @@ export function UseModelDrawer({
 }: UseModelDrawerProps) {
   const { t } = useTranslation()
   const systemConfigQuery = useSystemConfig()
-  const [task, setTask] = useState<UseModelTask>(defaultTask)
+  const [task, setTask] = useState<UseModelTask | null>(defaultTask)
 
   const hfEndpoint = systemConfigQuery.data?.endpoints?.hfBase || window.location.origin
   const engineLabel = ENGINE_LABELS[engine]
@@ -115,6 +113,7 @@ export function UseModelDrawer({
         w={150}
         allowDeselect={false}
         value={task}
+        placeholder={t('model.detail.useModel.selectTask')}
         onChange={value => value && setTask(value as UseModelTask)}
         data={TASK_OPTIONS.map(option => ({
           value: option,
@@ -122,6 +121,12 @@ export function UseModelDrawer({
         }))}
       />
     </Group>
+  )
+
+  const taskRequired = (
+    <Alert color="yellow" variant="light">
+      {t('model.detail.useModel.unsupportedTask')}
+    </Alert>
   )
 
   const envStep = (
@@ -189,21 +194,25 @@ export function UseModelDrawer({
                   extra={taskSelect}
                   hint={t('model.detail.useModel.steps.generateHint')}
                 >
-                  <Tabs defaultValue="pipeline" variant="default">
-                    <Tabs.List mb="xs">
-                      <Tabs.Tab value="pipeline">{t('model.detail.useModel.pipelineTab')}</Tabs.Tab>
-                      <Tabs.Tab value="lowLevel">{t('model.detail.useModel.lowLevelTab')}</Tabs.Tab>
-                    </Tabs.List>
-                    <Tabs.Panel value="pipeline">
-                      <SnippetBlock snippet={buildPipelineSnippet(task, modelPath, prompts)} />
-                    </Tabs.Panel>
-                    <Tabs.Panel value="lowLevel">
-                      <Stack gap="xs">
-                        <SnippetBlock snippet={buildLowLevelSnippet(task, modelPath, prompts)} />
-                        <Text size="xs" c="dimmed">{t('model.detail.useModel.lowLevelNote')}</Text>
-                      </Stack>
-                    </Tabs.Panel>
-                  </Tabs>
+                  {task
+                    ? (
+                        <Tabs defaultValue="pipeline" variant="default">
+                          <Tabs.List mb="xs">
+                            <Tabs.Tab value="pipeline">{t('model.detail.useModel.pipelineTab')}</Tabs.Tab>
+                            <Tabs.Tab value="lowLevel">{t('model.detail.useModel.lowLevelTab')}</Tabs.Tab>
+                          </Tabs.List>
+                          <Tabs.Panel value="pipeline">
+                            <SnippetBlock snippet={buildPipelineSnippet(task, modelPath, prompts)} />
+                          </Tabs.Panel>
+                          <Tabs.Panel value="lowLevel">
+                            <Stack gap="xs">
+                              <SnippetBlock snippet={buildLowLevelSnippet(task, modelPath, prompts)} />
+                              <Text size="xs" c="dimmed">{t('model.detail.useModel.lowLevelNote')}</Text>
+                            </Stack>
+                          </Tabs.Panel>
+                        </Tabs>
+                      )
+                    : taskRequired}
                 </Step>
               )
             : (
@@ -217,35 +226,12 @@ export function UseModelDrawer({
                     extra={taskSelect}
                     hint={t('model.detail.useModel.steps.testRequestHint')}
                   >
-                    <SnippetBlock snippet={buildTestRequestSnippet(engine, modelPath, task, prompts)} />
+                    {task
+                      ? <SnippetBlock snippet={buildTestRequestSnippet(engine, modelPath, task, prompts)} />
+                      : taskRequired}
                   </Step>
                 </>
               )}
-
-          <Accordion
-            variant="contained"
-            radius="sm"
-            chevronPosition="left"
-            classNames={{
-              item: classes.accordionItem,
-              control: classes.accordionControl,
-              content: classes.accordionContent,
-            }}
-          >
-            <Accordion.Item value="docker">
-              <Accordion.Control>
-                <Group gap="xs" wrap="nowrap">
-                  <Text size="sm" fw={600}>{t('model.detail.useModel.otherMethods')}</Text>
-                  <Text size="sm" fw={600}>Docker</Text>
-                </Group>
-              </Accordion.Control>
-              <Accordion.Panel>
-                {systemConfigQuery.isPending
-                  ? <Skeleton height={44} radius="sm" />
-                  : <SnippetBlock snippet={buildDockerSnippet(hfEndpoint, modelPath)} />}
-              </Accordion.Panel>
-            </Accordion.Item>
-          </Accordion>
         </Stack>
       </Box>
 

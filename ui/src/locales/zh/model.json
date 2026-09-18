@@ -76,6 +76,8 @@
         "imageUrl": "<图片地址>",
         "image": "请描述这张图片"
       },
+      "dockerHint": "需要安装并配置 Docker 和 NVIDIA Container Toolkit。",
+      "otherMethods": "其他方式",
       "viewDocs": "查看 {{engine}} 文档"
     }
   },

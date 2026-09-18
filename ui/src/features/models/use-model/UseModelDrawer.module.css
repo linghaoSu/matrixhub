@@ -47,3 +47,22 @@
   color: var(--mantine-color-dimmed);
   cursor: help;
 }
+
+.accordionItem,
+.accordionItem[data-active] {
+  border-color: var(--app-color-gray-30);
+  background: var(--app-color-background-body);
+}
+
+.accordionControl,
+.accordionControl:hover {
+  background: var(--app-color-gray-10);
+}
+
+.accordionItem[data-active] .accordionControl {
+  border-bottom: 1px solid var(--app-color-gray-30);
+}
+
+.accordionContent {
+  padding: var(--mantine-spacing-sm);
+}

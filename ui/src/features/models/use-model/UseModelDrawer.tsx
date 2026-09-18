@@ -1,4 +1,5 @@
 import {
+  Accordion,
   Alert,
   Anchor,
   Badge,
@@ -25,6 +26,7 @@ import { ShikiCodeBlock } from '@/shared/components/ShikiCodeBlock'
 
 import classes from './UseModelDrawer.module.css'
 import {
+  buildDockerSnippet,
   buildEnvSnippet,
   buildInstallSnippet,
   buildLowLevelSnippet,
@@ -232,6 +234,36 @@ export function UseModelDrawer({
                   </Step>
                 </>
               )}
+
+          {engine !== 'transformers' && (
+            <Accordion
+              variant="contained"
+              radius="sm"
+              chevronPosition="left"
+              classNames={{
+                item: classes.accordionItem,
+                control: classes.accordionControl,
+                content: classes.accordionContent,
+              }}
+            >
+              <Accordion.Item value="docker">
+                <Accordion.Control>
+                  <Group gap="xs" wrap="nowrap">
+                    <Text size="sm" fw={600}>{t('model.detail.useModel.otherMethods')}</Text>
+                    <Text size="sm" fw={600}>Docker</Text>
+                  </Group>
+                </Accordion.Control>
+                <Accordion.Panel>
+                  <Stack gap="xs">
+                    <Text size="xs" c="dimmed">{t('model.detail.useModel.dockerHint')}</Text>
+                    {systemConfigQuery.isPending
+                      ? <Skeleton height={164} radius="sm" />
+                      : <SnippetBlock snippet={buildDockerSnippet(engine, hfEndpoint, modelPath)} />}
+                  </Stack>
+                </Accordion.Panel>
+              </Accordion.Item>
+            </Accordion>
+          )}
         </Stack>
       </Box>
 

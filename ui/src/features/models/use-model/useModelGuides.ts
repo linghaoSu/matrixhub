@@ -121,6 +121,39 @@ export function buildTestRequestSnippet(
   }
 }
 
+export function buildDockerSnippet(
+  engine: Exclude<UseModelEngine, 'transformers'>,
+  hfEndpoint: string,
+  modelPath: string,
+): UseModelSnippet {
+  const commands = {
+    vllm: `docker run --runtime nvidia --gpus all \\
+  -v ~/.cache/huggingface:/root/.cache/huggingface \\
+  --env "HF_ENDPOINT=${hfEndpoint}" \\
+  --env "HF_TOKEN=$HF_TOKEN" \\
+  -p 8000:8000 \\
+  --ipc=host \\
+  vllm/vllm-openai:latest \\
+  --model "${modelPath}"`,
+    sglang: `docker run --gpus all \\
+  --shm-size 32g \\
+  -p 30000:30000 \\
+  -v ~/.cache/huggingface:/root/.cache/huggingface \\
+  --env "HF_ENDPOINT=${hfEndpoint}" \\
+  --env "HF_TOKEN=$HF_TOKEN" \\
+  --ipc=host \\
+  lmsysorg/sglang:latest \\
+  python3 -m sglang.launch_server \\
+    --model-path "${modelPath}" \\
+    --host 0.0.0.0 --port 30000`,
+  }
+
+  return {
+    lang: 'bash',
+    code: commands[engine],
+  }
+}
+
 function buildMessages(task: UseModelTask, prompts: SnippetPrompts): string {
   if (task === 'image-text-to-text') {
     return `messages = [{"role": "user", "content": [

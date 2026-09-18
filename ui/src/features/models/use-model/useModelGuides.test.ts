@@ -4,6 +4,7 @@ import {
 } from 'vitest'
 
 import {
+  buildDockerSnippet,
   buildEnvSnippet,
   buildLowLevelSnippet,
   buildPipelineSnippet,
@@ -78,6 +79,22 @@ describe('snippet builders', () => {
     expect(image).toContain('http://localhost:30000/v1/chat/completions')
     expect(image).toContain('"type": "image_url"')
     expect(image).toContain('"url": "<image-url>"')
+  })
+
+  it('passes the MatrixHub endpoint and token into engine Docker containers', () => {
+    const vllm = buildDockerSnippet('vllm', 'https://hub.example.com', 'org/model').code
+
+    expect(vllm).toContain('docker run --runtime nvidia --gpus all')
+    expect(vllm).toContain('vllm/vllm-openai:latest')
+    expect(vllm).toContain('--env "HF_ENDPOINT=https://hub.example.com"')
+    expect(vllm).toContain('--env "HF_TOKEN=$HF_TOKEN"')
+    expect(vllm).toContain('--model "org/model"')
+
+    const sglang = buildDockerSnippet('sglang', 'https://hub.example.com', 'org/model').code
+
+    expect(sglang).toContain('lmsysorg/sglang:latest')
+    expect(sglang).toContain('--env "HF_ENDPOINT=https://hub.example.com"')
+    expect(sglang).toContain('--model-path "org/model"')
   })
 
   it('does not print in the pipeline snippet', () => {

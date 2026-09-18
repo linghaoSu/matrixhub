@@ -76,6 +76,8 @@
         "imageUrl": "<image-url>",
         "image": "Describe this image"
       },
+      "dockerHint": "Requires Docker with NVIDIA Container Toolkit configured.",
+      "otherMethods": "Other methods",
       "viewDocs": "View {{engine}} docs"
     }
   },

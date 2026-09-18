@@ -429,6 +429,10 @@ test_prepare_workflow_uses_snapshot_lease() {
   assert_contains "$workflow" 'EXPECTED_REMOTE_SHA: ${{ steps.draft.outputs.expected_remote_sha }}' || return 1
   assert_contains "$workflow" '--force-with-lease="refs/heads/${RELEASE_BRANCH}:${EXPECTED_REMOTE_SHA}"' || return 1
   assert_not_contains "$workflow" 'git push --force-with-lease --set-upstream' || return 1
+  assert_contains "$workflow" 'description: Collection end tag or commit (leave empty for base_branch HEAD)' || return 1
+  assert_contains "$workflow" 'END_REF: ${{ inputs.end_ref }}' || return 1
+  assert_contains "$workflow" 'end_ref ${end_ref} must be an ancestor of ${BASE_BRANCH}' || return 1
+  assert_not_contains "$workflow" 'END_REF: HEAD' || return 1
 }
 
 test_changelog_create_and_prepend() {

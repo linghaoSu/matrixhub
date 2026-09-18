@@ -175,8 +175,12 @@ Create the draft around feature freeze or the first RC:
 3. Above the workflow runs, click **Run workflow** to open the form.
 4. Select the branch containing the workflow, normally `main`, then fill in:
    - **version:** the official `vX.Y.Z` version;
-   - **base_branch:** the branch to tag, normally `main`;
-   - **start_ref:** leave empty unless you need a custom range.
+   - **base_branch:** the branch that receives the changelog PR (and is later
+     tagged), normally `main`;
+   - **start_ref:** previous official tag, or leave empty to auto-detect;
+   - **end_ref:** leave empty to collect through `base_branch` HEAD. Set a tag
+     or commit to freeze the range, for example `v0.1.0` → `v0.2.0-rc.5` while
+     still opening the draft PR against `main`.
 5. Click the green **Run workflow** button in the form.
 6. When the run succeeds, review the draft PR from `release-notes/vX.Y.Z`. Add
    hand-written content outside the generated markers.

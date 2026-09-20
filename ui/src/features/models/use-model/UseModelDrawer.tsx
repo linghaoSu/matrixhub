@@ -7,6 +7,7 @@ import {
   Button,
   Drawer,
   Group,
+  rem,
   Select,
   Skeleton,
   Stack,
@@ -152,8 +153,8 @@ export function UseModelDrawer({
       title={<Text fw={600} fz="md">{t('model.detail.useModel.title', { engine: engineLabel })}</Text>}
       classNames={{ body: classes.body }}
     >
-      <Box className={classes.content}>
-        <Stack gap="md">
+      <Box className={classes.content} pt={rem('4px')}>
+        <Stack gap="sm">
           <Alert
             variant="light"
             color="cyan"
@@ -240,6 +241,7 @@ export function UseModelDrawer({
               variant="contained"
               radius="sm"
               chevronPosition="left"
+              mt={rem('4px')}
               classNames={{
                 item: classes.accordionItem,
                 control: classes.accordionControl,

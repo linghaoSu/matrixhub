@@ -172,8 +172,7 @@ export function buildPipelineSnippet(task: UseModelTask, modelPath: string, prom
     lang: 'python',
     code: `from transformers import pipeline
 
-pipe = pipeline("${task}", model="${modelPath}",
-                device_map="auto")
+pipe = pipeline("${task}", model="${modelPath}")
 
 ${buildMessages(task, prompts)}
 result = ${invocation}`,

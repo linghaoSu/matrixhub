@@ -4,6 +4,7 @@ import {
   Space,
   Stack,
 } from '@mantine/core'
+import { ProjectType } from '@matrixhub/api-ts/v1alpha1/project.pb'
 import { ProjectRoleType } from '@matrixhub/api-ts/v1alpha1/role.pb'
 import {
   IconClock,
@@ -173,7 +174,13 @@ export function ProjectModelsPage() {
         </SearchToolbar>
 
         {showProxyDownloadGuide
-          ? <ProxyProjectDownloadGuide remoteOrganization={project.organization} organization={project.name} />
+          ? (
+              <ProxyProjectDownloadGuide
+                remoteOrganization={project.organization}
+                organization={project.name}
+                requiresToken={project.type === ProjectType.PROJECT_TYPE_PRIVATE}
+              />
+            )
           : (
               <>
                 <Space h="lg" />
@@ -207,6 +214,7 @@ export function ProjectModelsPage() {
           opened={downloadDrawerOpened}
           remoteOrganization={project.organization}
           organization={project.name}
+          requiresToken={project.type === ProjectType.PROJECT_TYPE_PRIVATE}
           onClose={() => setDownloadDrawerOpened(false)}
         />
       )}

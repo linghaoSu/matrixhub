@@ -3,10 +3,8 @@ import {
   Anchor,
   Box,
   Button,
-  Code,
   Drawer,
   Group,
-  Paper,
   rem,
   SimpleGrid,
   Skeleton,
@@ -25,7 +23,7 @@ import { useTranslation } from 'react-i18next'
 import IconProxyProjectEmpty from '@/assets/svgs/proxy-project-empty.svg?react'
 import { createModelSchema } from '@/features/models/models.schema'
 import { useSystemConfig } from '@/features/system/system.query'
-import { CopyValueButton } from '@/shared/components/CopyValueButton'
+import { ShikiCodeBlock } from '@/shared/components/ShikiCodeBlock'
 import { useForm } from '@/shared/hooks/useForm'
 import { fieldError } from '@/shared/utils/form'
 
@@ -39,6 +37,7 @@ const HF_ENDPOINT_PLACEHOLDER = window.location.origin
 interface ProxyProjectDownloadProps {
   organization?: string
   remoteOrganization?: string
+  requiresToken?: boolean
 }
 
 interface ProxyProjectDownloadDrawerProps extends ProxyProjectDownloadProps {
@@ -66,6 +65,7 @@ function StepTitle({
 function ProxyProjectDownloadFlow({
   organization,
   remoteOrganization,
+  requiresToken,
   layout,
 }: ProxyProjectDownloadProps & {
   layout: 'drawer' | 'guide'
@@ -130,6 +130,7 @@ function ProxyProjectDownloadFlow({
             hfEndpoint,
             organization,
             modelName.trim() || t('projects.detail.proxyDownload.commandPlaceholder'),
+            requiresToken,
           )
 
           return (
@@ -137,16 +138,10 @@ function ProxyProjectDownloadFlow({
               <StepTitle number={2}>{t('projects.detail.proxyDownload.steps.command')}</StepTitle>
               {systemConfigQuery.isPending
                 ? <Skeleton h={76} />
-                : (
-                    <Paper withBorder p="sm" bg="gray.0">
-                      <Group justify="flex-end" mb="xs">
-                        <CopyValueButton value={command} />
-                      </Group>
-                      <Code block>{command}</Code>
-                    </Paper>
-                  )}
+                : <ShikiCodeBlock code={command} lang="bash" />}
               <Anchor
                 size="sm"
+                c="cyan.6"
                 href={t('common.docs', { doc: MODEL_DOWNLOAD_DOC_URL })}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -179,17 +174,18 @@ function ProxyProjectDownloadFlow({
             base: 1,
             md: 3,
           }}
-          spacing="xl"
+          spacing={rem('40px')}
         >
           {steps}
         </SimpleGrid>
       )
-    : <Stack gap="xl">{steps}</Stack>
+    : <Stack gap="lg">{steps}</Stack>
 }
 
 export function ProxyProjectDownloadGuide({
   organization,
   remoteOrganization,
+  requiresToken,
 }: ProxyProjectDownloadProps) {
   const { t } = useTranslation()
 
@@ -217,7 +213,12 @@ export function ProxyProjectDownloadGuide({
 
       <Box>
         <Title order={4} mb="md">{t('projects.detail.proxyDownload.quickDownload')}</Title>
-        <ProxyProjectDownloadFlow organization={organization} remoteOrganization={remoteOrganization} layout="guide" />
+        <ProxyProjectDownloadFlow
+          organization={organization}
+          remoteOrganization={remoteOrganization}
+          requiresToken={requiresToken}
+          layout="guide"
+        />
       </Box>
     </Stack>
   )
@@ -227,6 +228,7 @@ export function ProxyProjectDownloadDrawer({
   opened,
   organization,
   remoteOrganization,
+  requiresToken,
   onClose,
 }: ProxyProjectDownloadDrawerProps) {
   const { t } = useTranslation()
@@ -238,16 +240,28 @@ export function ProxyProjectDownloadDrawer({
       position="right"
       size="xl"
       title={t('projects.detail.proxyDownload.title')}
+      styles={{
+        body: {
+          display: 'flex',
+          flexDirection: 'column',
+          height: 'calc(100% - var(--drawer-header-height, 60px))',
+        },
+      }}
     >
-      <Stack gap="xl" h="100%">
+      <Stack gap="lg" h="100%" mt={rem('4px')}>
         <Alert color="cyan" variant="light" icon={<IconInfoCircle size={18} />}>
           {t('projects.detail.proxyDownload.drawerNotice')}
         </Alert>
 
-        <ProxyProjectDownloadFlow organization={organization} remoteOrganization={remoteOrganization} layout="drawer" />
+        <ProxyProjectDownloadFlow
+          organization={organization}
+          remoteOrganization={remoteOrganization}
+          requiresToken={requiresToken}
+          layout="drawer"
+        />
 
         <Group justify="flex-end" mt="auto">
-          <Button onClick={onClose}>
+          <Button color="cyan" variant="light" onClick={onClose}>
             {t('projects.detail.proxyDownload.acknowledge')}
           </Button>
         </Group>

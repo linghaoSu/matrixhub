@@ -11,4 +11,9 @@ describe('proxy projects', () => {
     expect(buildProxyDownloadCommand('https://matrixhub.example', 'Qwen', 'Qwen3-0.6B'))
       .toBe('export HF_ENDPOINT=https://matrixhub.example\nhf download Qwen/Qwen3-0.6B')
   })
+
+  it('includes a token placeholder for private projects', () => {
+    expect(buildProxyDownloadCommand('https://matrixhub.example', 'Qwen', 'Qwen3-0.6B', true))
+      .toBe('export HF_ENDPOINT=https://matrixhub.example\nexport HF_TOKEN="<your-matrixhub-token>"\nhf download Qwen/Qwen3-0.6B')
+  })
 })

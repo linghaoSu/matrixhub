@@ -1,4 +1,6 @@
 import {
+  ActionIcon,
+  Alert,
   Box,
   Button,
   Space,
@@ -9,7 +11,7 @@ import { ProjectRoleType } from '@matrixhub/api-ts/v1alpha1/role.pb'
 import {
   IconClock,
   IconCube,
-  IconDownload,
+  IconRefresh,
 } from '@tabler/icons-react'
 import {
   useQuery,
@@ -60,8 +62,10 @@ export function ProjectModelsPage() {
 
   const {
     data,
+    isError,
     isFetching,
     isPending,
+    refetch,
   } = useQuery(projectModelsQueryOptions(projectId, projectModelsRouteApi.useSearch()))
 
   const models = data?.items ?? []
@@ -76,7 +80,7 @@ export function ProjectModelsPage() {
   const showSkeletons = isPending && !data
   const isRefreshing = isFetching && !showSkeletons
   const isProxy = isProxyProject(project.registryUrl)
-  const showProxyDownloadGuide = isProxy && !isPending && project.modelCount === 0
+  const showProxyDownloadGuide = isProxy && !isPending && !isError && project.modelCount === 0
 
   const sortFieldOptions: SortDropdownOption[] = [
     {
@@ -115,6 +119,17 @@ export function ProjectModelsPage() {
             })
           }}
         >
+          <ActionIcon
+            variant="transparent"
+            size="lg"
+            onClick={() => void refetch()}
+            loading={isRefreshing}
+            c="gray.6"
+            aria-label={t('shared.refresh')}
+          >
+            <IconRefresh size={24} />
+          </ActionIcon>
+
           <SortDropdown
             fieldOptions={sortFieldOptions}
             fieldValue={sortField}
@@ -155,7 +170,7 @@ export function ProjectModelsPage() {
             ? (
                 <Button
                   radius={6}
-                  leftSection={<IconDownload size={16} />}
+                  leftSection={<IconCube size={16} />}
                   onClick={() => setDownloadDrawerOpened(true)}
                 >
                   {t('projects.detail.proxyDownload.title')}
@@ -173,40 +188,53 @@ export function ProjectModelsPage() {
             )}
         </SearchToolbar>
 
-        {showProxyDownloadGuide
+        {isError
           ? (
-              <ProxyProjectDownloadGuide
-                remoteOrganization={project.organization}
-                organization={project.name}
-                requiresToken={project.type === ProjectType.PROJECT_TYPE_PRIVATE}
-              />
-            )
-          : (
-              <>
-                <Space h="lg" />
-
-                <ResourceCardGrid
-                  loading={showSkeletons}
-                  skeletonCount={DEFAULT_PAGE_SIZE}
+              <Alert color="red" title={t('model.list.loadFailed')}>
+                <Button
+                  mt="sm"
+                  size="xs"
+                  variant="light"
+                  onClick={() => void refetch()}
                 >
-                  {cardElements}
-                </ResourceCardGrid>
-
-                <Pagination
-                  total={total}
-                  totalPages={totalPages}
-                  page={page}
-                  onPageChange={(nextPage) => {
-                    void navigate({
-                      search: prev => ({
-                        ...prev,
-                        page: nextPage,
-                      }),
-                    })
-                  }}
+                  {t('model.list.retry')}
+                </Button>
+              </Alert>
+            )
+          : showProxyDownloadGuide
+            ? (
+                <ProxyProjectDownloadGuide
+                  remoteOrganization={project.organization}
+                  organization={project.name}
+                  requiresToken={project.type === ProjectType.PROJECT_TYPE_PRIVATE}
                 />
-              </>
-            )}
+              )
+            : (
+                <>
+                  <Space h="lg" />
+
+                  <ResourceCardGrid
+                    loading={showSkeletons}
+                    skeletonCount={DEFAULT_PAGE_SIZE}
+                  >
+                    {cardElements}
+                  </ResourceCardGrid>
+
+                  <Pagination
+                    total={total}
+                    totalPages={totalPages}
+                    page={page}
+                    onPageChange={(nextPage) => {
+                      void navigate({
+                        search: prev => ({
+                          ...prev,
+                          page: nextPage,
+                        }),
+                      })
+                    }}
+                  />
+                </>
+              )}
       </Stack>
 
       {isProxy && (

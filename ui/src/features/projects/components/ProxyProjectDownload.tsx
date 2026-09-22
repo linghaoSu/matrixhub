@@ -179,7 +179,7 @@ function ProxyProjectDownloadFlow({
           {steps}
         </SimpleGrid>
       )
-    : <Stack gap="lg">{steps}</Stack>
+    : <Stack gap="sm">{steps}</Stack>
 }
 
 export function ProxyProjectDownloadGuide({
@@ -239,33 +239,50 @@ export function ProxyProjectDownloadDrawer({
       onClose={onClose}
       position="right"
       size="xl"
-      title={t('projects.detail.proxyDownload.title')}
+      title={<Text fw={600} fz="md">{t('projects.detail.proxyDownload.title')}</Text>}
       styles={{
         body: {
           display: 'flex',
           flexDirection: 'column',
           height: 'calc(100% - var(--drawer-header-height, 60px))',
+          padding: 0,
         },
       }}
     >
-      <Stack gap="lg" h="100%" mt={rem('4px')}>
-        <Alert color="cyan" variant="light" icon={<IconInfoCircle size={18} />}>
-          {t('projects.detail.proxyDownload.drawerNotice')}
-        </Alert>
+      <Box
+        pt={rem('4px')}
+        px="lg"
+        pb="md"
+        style={{
+          flex: 1,
+          minHeight: 0,
+          overflowY: 'auto',
+        }}
+      >
+        <Stack gap="sm">
+          <Alert color="cyan" variant="light" icon={<IconInfoCircle size={18} />}>
+            {t('projects.detail.proxyDownload.drawerNotice')}
+          </Alert>
 
-        <ProxyProjectDownloadFlow
-          organization={organization}
-          remoteOrganization={remoteOrganization}
-          requiresToken={requiresToken}
-          layout="drawer"
-        />
+          <ProxyProjectDownloadFlow
+            organization={organization}
+            remoteOrganization={remoteOrganization}
+            requiresToken={requiresToken}
+            layout="drawer"
+          />
+        </Stack>
+      </Box>
 
-        <Group justify="flex-end" mt="auto">
-          <Button color="cyan" variant="light" onClick={onClose}>
-            {t('projects.detail.proxyDownload.acknowledge')}
-          </Button>
-        </Group>
-      </Stack>
+      <Group
+        justify="flex-end"
+        px="lg"
+        py="sm"
+        style={{ borderTop: '1px solid var(--app-color-gray-30)' }}
+      >
+        <Button color="cyan" variant="light" onClick={onClose}>
+          {t('projects.detail.proxyDownload.acknowledge')}
+        </Button>
+      </Group>
     </Drawer>
   )
 }

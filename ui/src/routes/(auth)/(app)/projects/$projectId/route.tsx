@@ -86,7 +86,7 @@ function RouteComponent() {
             {activeTabLabel}
           </Text>
           {isProxyProject(project.registryUrl) && (
-            <Badge color="cyan" variant="light" size="xs">
+            <Badge ml={4} color="cyan" variant="light" size="xs">
               {t('projects.detail.proxyBadge')}
             </Badge>
           )}
